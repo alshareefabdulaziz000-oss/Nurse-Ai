@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
+<title>NurseAI Pro</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#030912;--bg1:#050e1c;--bg2:#071526;--bg3:#0a1c34;
+  --sur:#0d2040;--sur2:#102548;
+  --ln:#162e50;--ln2:#1e3d68;--ln3:#274f84;
+  --em:#00d4b4;--em2:#00a890;--em3:#007a68;--em4:#005448;
+  --emg:rgba(0,212,180,.12);--emg2:rgba(0,212,180,.05);
+  --blue:#3fb8f0;--red:#e05555;--amber:#d4922a;--green:#2ecc8a;--purple:#9b7fe8;
+  --tx:#cce8e4;--tx2:#8aaeac;--tx3:#4a7070;
+  --r:14px;--rs:9px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);}
+body{font-family:'Cairo',Tahoma,'Arial Unicode MS',sans-serif;color:var(--tx);}
+
+/* ── LANG SCREEN ── */
+#LS{position:fixed;inset:0;z-index:9999;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:20px;}
+#LS.gone{display:none;}
+.ls-bg{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
+.ls-bg::before{content:’’;position:absolute;top:-100px;left:50%;width:600px;height:600px;transform:translateX(-50%);background:radial-gradient(circle,rgba(0,212,180,.07),transparent 70%);}
+.ls-bg::after{content:’’;position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,180,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,180,.025) 1px,transparent 1px);background-size:48px 48px;}
+.ls-z{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;}
+.ls-badge{display:inline-flex;align-items:center;gap:7px;background:rgba(0,212,180,.08);border:1px solid rgba(0,212,180,.2);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:700;color:var(–em);letter-spacing:1px;text-transform:uppercase;}
+.ls-dot{width:6px;height:6px;border-radius:50%;background:var(–em);box-shadow:0 0 8px var(–em);}
+.ls-icon{width:88px;height:88px;background:linear-gradient(135deg,var(–em3),var(–em4));border-radius:26px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(0,212,180,.25),0 0 0 1px rgba(0,212,180,.2);}
+.ls-icon svg{width:44px;height:44px;}
+.ls-title{font-size:32px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-1px;}
+.ls-title span{color:var(–em);}
+.ls-sub{font-size:12px;color:var(–tx2);line-height:1.7;}
+.ls-div{display:flex;align-items:center;gap:12px;width:320px;}
+.ls-div-line{flex:1;height:1px;background:var(–ln);}
+.ls-div span{font-size:11px;color:var(–tx3);white-space:nowrap;}
+.ls-cards{display:flex;gap:12px;}
+.ls-card{width:148px;height:100px;cursor:pointer;background:var(–sur);border:2px solid var(–ln2);border-radius:var(–r);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:all .25s;}
+.ls-card:hover{border-color:var(–em);box-shadow:0 0 0 1px rgba(0,212,180,.2),0 8px 32px rgba(0,212,180,.08);transform:translateY(-2px);}
+.ls-card .flag{font-size:32px;}
+.ls-card .ln2{font-size:14px;font-weight:800;color:#fff;}
+.ls-card .ls2{font-size:11px;color:var(–tx3);}
+
+/* ── APP ── */
+#APP{display:none;height:100vh;}
+#APP.show{display:flex;}
+
+/* ── SIDEBAR ── */
+.sb{width:60px;flex-shrink:0;background:var(–bg1);border-left:1px solid var(–ln);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:2px;z-index:100;}
+.sb-brand{width:38px;height:38px;cursor:pointer;background:linear-gradient(135deg,var(–em3),var(–em4));border-radius:11px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(0,212,180,.2);transition:box-shadow .2s;}
+.sb-brand:hover{box-shadow:0 0 28px rgba(0,212,180,.35);}
+.sb-brand svg{width:20px;height:20px;}
+.sb-sep{width:32px;height:1px;background:var(–ln);margin:5px 0;}
+.nv{width:44px;height:44px;border:none;border-radius:11px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;color:var(–tx3);position:relative;}
+.nv:hover{background:var(–sur);color:var(–tx);}
+.nv.on{background:var(–emg);color:var(–em);box-shadow:inset 0 0 0 1px rgba(0,212,180,.22);}
+.nv svg{width:20px;height:20px;fill:currentColor;}
+.nv .tip{position:absolute;right:48px;z-index:200;background:var(–sur2);border:1px solid var(–ln2);color:var(–tx);font-family:inherit;font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;box-shadow:0 4px 16px rgba(0,0,0,.3);}
+.nv:hover .tip{opacity:1;}
+.sb-bot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.api-btn{width:44px;height:44px;border:none;border-radius:11px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(–tx3);transition:all .2s;position:relative;}
+.api-btn:hover{background:var(–sur);color:var(–em);}
+.api-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.api-ind{position:absolute;bottom:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(–tx3);transition:all .3s;}
+.api-ind.ok{background:var(–green);box-shadow:0 0 6px var(–green);}
+.api-ind.err{background:var(–red);}
+.api-tip{position:absolute;right:48px;z-index:200;background:var(–sur2);border:1px solid var(–ln2);color:var(–tx);font-family:inherit;font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s;}
+.api-btn:hover .api-tip{opacity:1;}
+
+/* ── API POPUP ── */
+.api-pop{position:fixed;bottom:54px;right:66px;width:262px;z-index:500;background:var(–sur2);border:1px solid var(–ln3);border-radius:var(–r);padding:15px;box-shadow:0 20px 60px rgba(0,0,0,.6);display:none;}
+.api-pop.open{display:block;}
+.api-pop h4{font-size:12px;font-weight:700;color:var(–em);margin-bottom:9px;}
+.api-pop input{width:100%;background:var(–bg2);border:1px solid var(–ln2);color:var(–tx);padding:8px 10px;border-radius:var(–rs);font-family:monospace;font-size:11px;outline:none;transition:border .2s;}
+.api-pop input:focus{border-color:var(–em);}
+.api-pop-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
+.api-pop-dot{width:7px;height:7px;border-radius:50%;background:var(–tx3);flex-shrink:0;transition:all .3s;}
+.api-pop-dot.ok{background:var(–green);box-shadow:0 0 6px var(–green);}
+.api-pop-dot.err{background:var(–red);}
+.api-pop-txt{font-size:11px;color:var(–tx2);}
+.api-pop p{font-size:10px;color:var(–tx3);margin-top:7px;line-height:1.6;}
+
+/* ── MAIN ── */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;}
+.topbar{height:52px;flex-shrink:0;background:rgba(5,14,28,.97);backdrop-filter:blur(20px);border-bottom:1px solid var(–ln);display:flex;align-items:center;padding:0 16px;gap:10px;}
+.tb-info h2{font-size:14px;font-weight:800;color:#fff;line-height:1;}
+.tb-info p{font-size:10px;color:var(–tx3);margin-top:2px;}
+.tb-right{margin-right:auto;display:flex;align-items:center;}
+.lchip{display:flex;align-items:center;gap:5px;background:var(–sur);border:1px solid var(–ln2);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(–tx2);cursor:pointer;transition:all .2s;}
+.lchip:hover{border-color:var(–em);color:var(–em);}
+
+/* ── CONTENT ── */
+.content{flex:1;overflow:hidden;position:relative;}
+.vw{display:none;height:100%;flex-direction:column;overflow:hidden;}
+.vw.on{display:flex;}
+.scr{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;}
+.scr::-webkit-scrollbar{width:3px;}
+.scr::-webkit-scrollbar-thumb{background:var(–ln2);border-radius:3px;}
+
+/* ── UI COMPONENTS ── */
+.shr{font-size:10px;font-weight:700;color:var(–em);letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:7px;}
+.shr::after{content:’’;flex:1;height:1px;background:var(–ln);}
+.card{background:var(–sur);border:1px solid var(–ln);border-radius:var(–r);overflow:hidden;}
+.ch{padding:13px 15px 0;display:flex;align-items:flex-start;gap:9px;}
+.ci{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ci svg{width:17px;height:17px;}
+.ct{font-size:13px;font-weight:800;color:#fff;line-height:1.2;}
+.cs{font-size:11px;color:var(–tx3);margin-top:2px;}
+.cb{padding:13px 15px;}
+.inp{width:100%;background:var(–bg2);border:1px solid var(–ln);color:var(–tx);padding:9px 12px;border-radius:var(–rs);font-size:13px;font-family:inherit;outline:none;transition:border .2s;}
+.inp:focus{border-color:var(–em);}
+.inp::placeholder{color:var(–tx3);}
+select.inp option{background:var(–sur);}
+.lbl{font-size:11px;font-weight:600;color:var(–tx2);margin-bottom:5px;display:block;}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:10px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.btn{width:100%;padding:10px;background:linear-gradient(135deg,var(–em2),var(–em4));border:none;border-radius:var(–rs);color:#fff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 4px 20px rgba(0,212,180,.12);}
+.btn:hover{box-shadow:0 4px 28px rgba(0,212,180,.28);transform:translateY(-1px);}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+.gbtn{display:inline-flex;align-items:center;gap:5px;background:var(–sur);border:1px solid var(–ln2);color:var(–tx2);padding:7px 12px;border-radius:var(–rs);font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.gbtn:hover{border-color:var(–em);color:var(–em);}
+.chip{background:var(–sur);border:1px solid var(–ln);color:var(–tx2);padding:5px 10px;border-radius:20px;font-size:11px;font-family:inherit;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.chip:hover{border-color:var(–em2);color:var(–em);}
+.sp{width:13px;height:13px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:rot .6s linear infinite;}
+.sp-lg{width:28px;height:28px;border:3px solid rgba(0,212,180,.18);border-top-color:var(–em);border-radius:50%;animation:rot .7s linear infinite;}
+@keyframes rot{to{transform:rotate(360deg);}}
+.loading{display:none;flex-direction:column;align-items:center;gap:10px;padding:28px;text-align:center;}
+.loading.on{display:flex;}
+.loading p{font-size:12px;color:var(–tx3);}
+.rbox{display:none;background:var(–sur);border:1px solid var(–ln2);border-radius:var(–r);overflow:hidden;animation:fup .25s ease;}
+.rbox.on{display:block;}
+@keyframes fup{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.rh{padding:10px 14px;border-bottom:1px solid var(–ln);display:flex;align-items:center;gap:8px;background:rgba(0,212,180,.03);}
+.rbadge{font-size:9px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(–em);background:var(–emg);border:1px solid rgba(0,212,180,.2);padding:2px 7px;border-radius:4px;}
+.rbody{padding:14px;font-size:13px;line-height:1.85;color:var(–tx);white-space:pre-wrap;word-break:break-word;}
+
+/* ── DASHBOARD ── */
+.hero{background:linear-gradient(135deg,#071628,#0b2040,#071830);border:1px solid var(–ln2);border-radius:var(–r);padding:20px;position:relative;overflow:hidden;}
+.hero::before{content:’’;position:absolute;top:-60px;right:-60px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,212,180,.07),transparent 70%);pointer-events:none;}
+.hero-lbl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(–em);margin-bottom:7px;}
+.hero-ttl{font-size:22px;font-weight:900;color:#fff;line-height:1.1;letter-spacing:-.5px;margin-bottom:5px;}
+.hero-desc{font-size:12px;color:var(–tx2);line-height:1.75;}
+.hero-refs{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;}
+.rpill{font-size:9px;font-weight:700;color:rgba(0,212,180,.8);background:rgba(0,212,180,.05);border:1px solid rgba(0,212,180,.12);padding:2px 6px;border-radius:3px;}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.sc{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);padding:12px;text-align:center;}
+.sv{font-size:22px;font-weight:800;font-family:monospace;color:var(–em);}
+.sl{font-size:10px;color:var(–tx3);margin-top:2px;font-weight:600;}
+.qag{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.qa{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);padding:12px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:9px;}
+.qa:hover{border-color:var(–em2);box-shadow:0 4px 20px rgba(0,212,180,.06);transform:translateY(-1px);}
+.qa-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.qa-ic svg{width:16px;height:16px;}
+.qa h4{font-size:12px;font-weight:700;color:#fff;}
+.qa p{font-size:10px;color:var(–tx3);}
+.dash-chips{display:flex;gap:6px;flex-wrap:wrap;}
+
+/* ── CHAT ── */
+.cw{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.cm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px;}
+.cm::-webkit-scrollbar{width:3px;}
+.cm::-webkit-scrollbar-thumb{background:var(–ln2);border-radius:3px;}
+.cwelcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:30px;text-align:center;}
+.cw-ic{width:66px;height:66px;background:rgba(0,212,180,.05);border:1px solid rgba(0,212,180,.15);border-radius:20px;display:flex;align-items:center;justify-content:center;}
+.cw-ic svg{width:30px;height:30px;fill:none;stroke:var(–em);stroke-width:1.5;}
+.cw-t{font-size:17px;font-weight:900;color:#fff;}
+.cw-s{font-size:12px;color:var(–tx2);line-height:1.75;max-width:270px;}
+.msg{display:flex;gap:9px;max-width:90%;animation:fup .2s ease;}
+.msg.u{flex-direction:row-reverse;align-self:flex-end;}
+.msg.b{align-self:flex-start;}
+.av{width:32px;height:32px;border-radius:9px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;}
+.msg.u .av{background:var(–tx3);}
+.msg.b .av{background:linear-gradient(135deg,var(–em3),var(–em4));box-shadow:0 0 12px rgba(0,212,180,.18);}
+.av svg{width:15px;height:15px;fill:currentColor;}
+.bbl{padding:9px 13px;border-radius:11px;font-size:13px;line-height:1.8;white-space:pre-wrap;word-break:break-word;}
+.msg.u .bbl{background:linear-gradient(135deg,var(–em3),var(–em4));color:#fff;border-radius:11px 2px 11px 11px;}
+.msg.b .bbl{background:var(–sur);border:1px solid var(–ln);border-radius:2px 11px 11px 11px;color:var(–tx);}
+.btag{font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(–em);background:var(–emg);border:1px solid rgba(0,212,180,.18);padding:2px 7px;border-radius:4px;margin-bottom:6px;display:inline-block;}
+.tw{display:flex;gap:9px;align-self:flex-start;}
+.tdw{background:var(–sur);border:1px solid var(–ln);border-radius:2px 11px 11px 11px;padding:11px 14px;display:flex;gap:4px;align-items:center;}
+.td{width:5px;height:5px;border-radius:50%;background:var(–em);animation:tdot 1.2s infinite;}
+.td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.3;}30%{transform:translateY(-5px);opacity:1;}}
+.ccr{display:flex;gap:5px;padding:7px 14px;overflow-x:auto;flex-shrink:0;}
+.ccr::-webkit-scrollbar{display:none;}
+.cia{display:flex;gap:7px;align-items:flex-end;padding:9px 14px;background:rgba(5,14,28,.98);border-top:1px solid var(–ln);flex-shrink:0;}
+.cta{flex:1;background:var(–sur);border:1px solid var(–ln);color:var(–tx);padding:9px 12px;border-radius:10px;font-size:13px;font-family:inherit;resize:none;outline:none;max-height:110px;line-height:1.6;transition:border .2s;direction:rtl;}
+.cta:focus{border-color:var(–em);}
+.cta::placeholder{color:var(–tx3);}
+.send{width:40px;height:40px;flex-shrink:0;background:linear-gradient(135deg,var(–em2),var(–em4));border:none;border-radius:10px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(0,212,180,.18);}
+.send:hover{transform:scale(1.06);box-shadow:0 4px 22px rgba(0,212,180,.32);}
+.send:disabled{opacity:.3;cursor:not-allowed;transform:none;}
+.send svg{width:17px;height:17px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;}
+
+/* ── DOSE TABS ── */
+.dtabs{display:flex;gap:5px;margin-bottom:12px;}
+.dtab{flex:1;padding:9px;background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);font-family:inherit;font-size:12px;font-weight:600;color:var(–tx2);cursor:pointer;text-align:center;transition:all .2s;}
+.dtab.on{background:var(–emg);border-color:var(–em);color:var(–em);}
+.dpanel{display:none;}
+.dpanel.on{display:block;}
+.dres{margin-top:10px;display:none;background:rgba(0,212,180,.04);border:1px solid rgba(0,212,180,.18);border-radius:var(–rs);padding:12px;}
+.dres.on{display:block;}
+.dres-v{font-size:20px;font-weight:800;color:var(–em);font-family:monospace;margin-bottom:5px;}
+.dres-s{font-size:11px;color:var(–tx3);line-height:1.75;}
+.dres-w{font-size:10px;color:var(–amber);margin-top:7px;padding-top:7px;border-top:1px solid rgba(212,146,42,.12);}
+
+/* ── QUIZ ── */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px;}
+.tb{background:var(–bg2);border:1px solid var(–ln);color:var(–tx2);padding:8px 5px;border-radius:var(–rs);font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .2s;}
+.tb.on{border-color:var(–em);color:var(–em);background:var(–emg);}
+.qbox{background:var(–sur);border:1px solid var(–ln);border-radius:var(–r);padding:15px;display:none;}
+.qbox.on{display:block;}
+.qnum{font-family:monospace;font-size:10px;color:var(–em);margin-bottom:6px;font-weight:600;}
+.qtext{font-size:14px;font-weight:600;line-height:1.8;margin-bottom:11px;color:#fff;}
+.qchs{display:flex;flex-direction:column;gap:7px;}
+.qch{background:var(–bg2);border:1px solid var(–ln);border-radius:var(–rs);padding:9px 12px;font-family:inherit;font-size:12px;color:var(–tx);text-align:right;cursor:pointer;transition:all .2s;}
+.qch:hover:not([disabled]){border-color:var(–ln2);background:var(–sur);}
+.qch.ok{border-color:var(–green);background:rgba(46,204,138,.07);color:#a7f3d0;}
+.qch.no{border-color:var(–red);background:rgba(224,85,85,.07);color:#fecaca;}
+.qexp{display:none;margin-top:10px;background:rgba(63,184,240,.05);border:1px solid rgba(63,184,240,.14);border-radius:var(–rs);padding:11px;font-size:12px;line-height:1.8;color:#bae6fd;}
+.qexp.on{display:block;}
+.srow{display:flex;gap:6px;}
+.sbdg{background:var(–sur);border:1px solid var(–ln);border-radius:6px;padding:5px 11px;font-family:monospace;font-size:11px;color:var(–tx2);}
+.sbdg b{color:var(–em);}
+
+/* ── PROCEDURES ── */
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.pcc{background:var(–sur);border:1px solid var(–ln);border-radius:var(–r);padding:13px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:10px;}
+.pcc:hover{border-color:var(–em2);transform:translateY(-1px);}
+.pc-ic{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pc-ic svg{width:19px;height:19px;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.pc-info h4{font-size:12px;font-weight:700;color:#fff;}
+.pc-info p{font-size:10px;color:var(–tx3);}
+.pc-cnt{font-size:9px;font-weight:700;color:var(–em);background:var(–emg);border:1px solid rgba(0,212,180,.18);padding:1px 5px;border-radius:3px;margin-top:4px;display:inline-block;}
+.pl{display:flex;flex-direction:column;gap:7px;}
+.pi{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);padding:11px 13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:space-between;}
+.pi:hover{border-color:var(–em2);}
+.pi-l{display:flex;align-items:center;gap:8px;}
+.pi-ic{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.pi-ic svg{width:14px;height:14px;fill:none;stroke-width:1.5;stroke-linecap:round;}
+.pi h4{font-size:12px;font-weight:700;color:#fff;}
+.pi-arr svg{width:13px;height:13px;fill:none;stroke:var(–tx3);stroke-width:2;}
+.ptabs{display:flex;gap:5px;margin-bottom:11px;}
+.ptab{flex:1;padding:8px;background:var(–bg2);border:1px solid var(–ln);border-radius:var(–rs);font-family:inherit;font-size:12px;font-weight:600;color:var(–tx2);cursor:pointer;text-align:center;transition:all .2s;}
+.ptab.on{background:var(–emg);border-color:var(–em);color:var(–em);}
+.ptp{display:none;}
+.ptp.on{display:block;}
+.vidc{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:var(–r);background:var(–bg2);border:1px solid var(–ln);}
+.vidc iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:var(–r);}
+.vn{margin-top:7px;padding:8px 10px;background:var(–bg2);border-radius:var(–rs);font-size:11px;color:var(–tx3);line-height:1.6;}
+.ptxt{display:flex;flex-direction:column;gap:11px;}
+.psec{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);overflow:hidden;}
+.psh{padding:9px 12px;border-bottom:1px solid var(–ln);background:rgba(0,212,180,.03);}
+.psh-t{font-size:10px;font-weight:700;color:var(–em);letter-spacing:.5px;text-transform:uppercase;}
+.psb{padding:10px 12px;font-size:12px;color:var(–tx);line-height:1.8;white-space:pre-wrap;}
+.psteps{display:flex;flex-direction:column;gap:7px;}
+.pstep{display:flex;gap:9px;align-items:flex-start;}
+.psn{min-width:21px;height:21px;background:linear-gradient(135deg,var(–em3),var(–em4));border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px;}
+.pst{font-size:12px;color:var(–tx);line-height:1.7;}
+.pnote{padding:9px 11px;background:rgba(212,146,42,.04);border:1px solid rgba(212,146,42,.15);border-radius:var(–rs);font-size:11px;color:#fde68a;line-height:1.7;}
+.pdanger{padding:9px 11px;background:rgba(224,85,85,.04);border:1px solid rgba(224,85,85,.15);border-radius:var(–rs);font-size:11px;color:#fca5a5;line-height:1.7;}
+.pref{padding:7px 11px;background:rgba(0,212,180,.03);border:1px solid rgba(0,212,180,.1);border-radius:var(–rs);font-size:10px;color:var(–em2);}
+.pql{display:flex;flex-direction:column;gap:9px;}
+.pqi{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);padding:12px;}
+.pqn{font-family:monospace;font-size:9px;color:var(–em);margin-bottom:5px;font-weight:600;}
+.pqq{font-size:12px;font-weight:600;line-height:1.75;margin-bottom:8px;color:#fff;}
+.pqcs{display:flex;flex-direction:column;gap:5px;}
+.pqc{background:var(–bg2);border:1px solid var(–ln);border-radius:var(–rs);padding:8px 11px;font-family:inherit;font-size:11px;color:var(–tx);text-align:right;cursor:pointer;transition:all .2s;}
+.pqc:hover:not([disabled]){border-color:var(–ln2);}
+.pqc.ok{border-color:var(–green);background:rgba(46,204,138,.07);color:#a7f3d0;}
+.pqc.no{border-color:var(–red);background:rgba(224,85,85,.07);color:#fecaca;}
+.pqe{display:none;margin-top:7px;background:rgba(63,184,240,.04);border:1px solid rgba(63,184,240,.12);border-radius:var(–rs);padding:9px;font-size:11px;line-height:1.8;color:#bae6fd;}
+.pqe.on{display:block;}
+
+/* ── VITALS ── */
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.vc{background:var(–sur);border:1px solid var(–ln);border-radius:var(–rs);padding:11px;display:flex;flex-direction:column;gap:6px;}
+.vc label{font-size:11px;font-weight:600;color:var(–tx2);}
+.vi{background:var(–bg2);border:1px solid var(–ln);color:var(–tx);padding:7px 9px;border-radius:var(–rs);font-family:monospace;font-size:15px;font-weight:700;outline:none;width:100%;transition:border .2s;}
+.vi:focus{border-color:var(–em);}
+.vs{font-size:10px;padding:2px 6px;border-radius:4px;width:fit-content;font-weight:700;}
+.vn2{background:rgba(46,204,138,.08);color:var(–green);border:1px solid rgba(46,204,138,.18);}
+.vw2{background:rgba(212,146,42,.08);color:var(–amber);border:1px solid rgba(212,146,42,.18);}
+.vc2{background:rgba(224,85,85,.08);color:var(–red);border:1px solid rgba(224,85,85,.18);}
+</style>
+
+</head>
+<body>
+
+<!-- DATA STORE - all Arabic/Unicode data here, NOT in JS -->
+
+<script id="D" type="application/json">
+{
+  "lang_ar":{
+    "dir":"rtl",
+    "pages":{"dash":["لوحة التحكم","الممرض الافتراضي NurseAI Pro"],"chat":["الممرض الافتراضي","مقيّد بالمراجع المعتمدة فقط"],"drugs":["موسوعة الأدوية","أي دواء في العالم"],"dose":["حاسبة الجرعات","دقيقة من المراجع الصيدلانية"],"quiz":["الاختبارات","NCLEX & Prometric"],"proc":["الإجراءات التمريضية","شرح + فيديو + 5 أسئلة"],"vitals":["العلامات الحيوية","تقييم فوري"]},
+    "syslang":"أجب باللغة العربية الفصحى فقط",
+    "chatPH":"اسأل أي سؤال تمريضي...",
+    "chatChips":["5 Rights الأدوية","GCS Scale","علامات Sepsis","تفسير ABG","SBAR","Acid-Base"],
+    "dashChips":["ما هي 5 Rights في إعطاء الدواء؟","اشرح Glasgow Coma Scale","ما علامات الإنتان Sepsis؟","كيف تفسر نتائج ABG؟","اشرح SBAR في التواصل"],
+    "flag":"🇸🇦","fname":"عربي",
+    "cwt":"الممرض الافتراضي",
+    "cws":"اسألني أي سؤال تمريضي — سأجيب فقط من المراجع التمريضية المعتمدة",
+    "topics":{"general":"تمريض عام","pharma":"أدوية","anatomy":"تشريح","critical":"رعاية حرجة","pediatric":"أطفال","nclex":"NCLEX"},
+    "apiStatus":{"ok":"متصل","err":"مفتاح خاطئ","empty":"أدخل مفتاحك"},
+    "back":"رجوع",
+    "backCats":"رجوع للأقسام",
+    "proc_label":"إجراء",
+    "loading":"جاري التحميل...",
+    "searchDrug":"ابحث في الموسوعة",
+    "calcBtn":"احسب من المراجع",
+    "newQ":"سؤال جديد",
+    "score":{"r":"صح","w":"غلط","p":"النسبة"},
+    "noKey":"أدخل Groq API Key أولاً",
+    "noKey2":"أدخل Groq API Key (اضغط أيقونة المفتاح)",
+    "drugPH":"اكتب اسم الدواء — Vancomycin / هيبارين / أملوديبين...",
+    "drugLoading":"جاري البحث في المراجع التمريضية...",
+    "doseLoading":"جاري الحساب من المراجع...",
+    "procSoon":"سيتم إضافة إجراءات هذا القسم قريباً"
+  },
+  "lang_en":{
+    "dir":"ltr",
+    "pages":{"dash":["Dashboard","NurseAI Pro — Nursing Assistant"],"chat":["Virtual Nurse AI","Evidence-based nursing only"],"drugs":["Drug Encyclopedia","Any drug worldwide"],"dose":["Dose Calculator","From pharmacological references"],"quiz":["Nursing Exams","NCLEX & Prometric"],"proc":["Nursing Procedures","Text + Video + 5 Questions"],"vitals":["Vital Signs","Instant assessment"]},
+    "syslang":"Answer in English only. Never use Arabic.",
+    "chatPH":"Ask any nursing question...",
+    "chatChips":["5 Rights Medication","GCS Scale","Signs of Sepsis","ABG Interpretation","SBAR","Acid-Base"],
+    "dashChips":["What are the 5 Rights of medication administration?","Explain Glasgow Coma Scale","What are signs of Sepsis?","How to interpret ABG results?","Explain SBAR communication"],
+    "flag":"🇬🇧","fname":"English",
+    "cwt":"Virtual Nurse AI",
+    "cws":"Ask any nursing question — I answer only from accredited nursing references",
+    "topics":{"general":"General Nursing","pharma":"Pharmacology","anatomy":"Anatomy","critical":"Critical Care","pediatric":"Pediatrics","nclex":"NCLEX"},
+    "apiStatus":{"ok":"Connected","err":"Invalid key","empty":"Enter your key"},
+    "back":"Back",
+    "backCats":"Back to Categories",
+    "proc_label":"procedure",
+    "loading":"Loading...",
+    "searchDrug":"Search Encyclopedia",
+    "calcBtn":"Calculate from References",
+    "newQ":"New Question",
+    "score":{"r":"Correct","w":"Wrong","p":"Score"},
+    "noKey":"Enter Groq API Key first",
+    "noKey2":"Enter Groq API Key (click key icon)",
+    "drugPH":"Enter drug name — Vancomycin / Heparin / Amlodipine...",
+    "drugLoading":"Searching nursing references...",
+    "doseLoading":"Calculating from pharmacological references...",
+    "procSoon":"Procedures for this section coming soon"
+  },
+  "proc_cats":[
+    {"id":"fund","ar":"أسس التمريض","en":"Fundamentals","col":"rgba(0,212,180,.08)","stroke":"#00d4b4",
+     "procs":[
+      {"id":"sc","ar":"الحقن تحت الجلد SC","en":"Subcutaneous Injection","vid":"https://www.youtube.com/embed/VFDSjKvqOFI",
+       "sec_ar":[
+        {"h":"التعريف","b":"حقن دواء في الطبقة الدهنية تحت الجلد بزاوية 45-90 درجة. يُستخدم للأنسولين وHeparin وبعض اللقاحات."},
+        {"h":"المعدات","b":"حقنة 1-3ml، إبرة 25-27G (5-8mm)، كحول 70%، قطن، حاوية Sharp Container"},
+        {"h":"خطوات الإجراء","steps":["اغسل يديك وارتدِ القفازات","تحقق من 5 Rights كاملاً","اختر موقع الحقن ودوّر المواقع (بطن > ذراع > فخذ > ردف)","نظّف الجلد بكحول 70% وانتظر 30 ثانية","اقرص الجلد بلطف (للنحيف) أو ثبّته","ادخل الإبرة 90° للطبيعي، 45° للنحيف جداً","اضغط المكبس ببطء حتى آخره","انتظر 10 ثوانٍ ثم اسحب الإبرة","اضغط بلطف بالقطن ولا تفرك","تخلص من الإبرة في Sharp Container فوراً","وثّق: الوقت، الجرعة، الموقع"]}
+       ],
+       "notes_ar":["دوّر مواقع الحقن لمنع Lipodystrophy","لا تفرك الموقع بعد الحقن","انتظر 10 ثوانٍ لضمان إعطاء الجرعة كاملة"],
+       "danger_ar":"جرعة زائدة من الأنسولين = Hypoglycemia حادة. المضاد: 15g جلوكوز أو Glucagon IV/IM",
+       "ref_ar":"Potter & Perry Fundamentals 10th ed | Mosby's Nursing Drug Reference",
+       "quiz_ar":[
+        {"q":"أهم إجراء قبل حقن الأنسولين SC؟","ch":["اختيار الموقع","قياس سكر الدم والتحقق من 5 Rights","تحضير الحقنة","غسل اليدين فقط"],"c":1,"e":"CBG + 5 Rights أساسيان. الأنسولين دون قياس السكر يسبب Hypoglycemia. المرجع: Potter & Perry 10th ed"},
+        {"q":"كم ثانية تنتظر بعد الضغط على مكبس قلم الأنسولين؟","ch":["ثانية واحدة","5 ثوانٍ","10 ثوانٍ","20 ثانية"],"c":2,"e":"10 ثوانٍ لضمان إعطاء الجرعة كاملة دون تسرّب. المرجع: Mosby's Nursing Drug Reference"},
+        {"q":"أسرع منطقة امتصاص للأنسولين Regular؟","ch":["الفخذ","الذراع","البطن","الأرداف"],"c":2,"e":"البطن أسرع امتصاص للأنسولين Regular. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"CBG = 55 mg/dL بعد الأنسولين. الإجراء الأول؟","ch":["إعادة القياس فقط","15g جلوكوز سريع الامتصاص فوراً","الاتصال بالطبيب أولاً","إعطاء الأنسولين مجدداً"],"c":1,"e":"قاعدة 15-15: CBG أقل من 70 = 15g جلوكوز ثم قِس بعد 15 دقيقة. المرجع: ADA Clinical Practice Guidelines"},
+        {"q":"لماذا يُمنع فرك موقع الحقن SC؟","ch":["يسبب ألماً","يسرّع الامتصاص بشكل غير منتظم","يتلف الإبرة","يسبب نزيفاً"],"c":1,"e":"الفرك يسرّع الامتصاص بشكل غير قابل للتحكم. المرجع: Potter & Perry 10th ed"}
+       ]
+      },
+      {"id":"ivc","ar":"تركيب الكانيولا الوريدية IV","en":"IV Cannula Insertion","vid":"https://www.youtube.com/embed/6Y8q4EE8e8c",
+       "sec_ar":[
+        {"h":"التعريف","b":"وصول وريدي محيطي لإعطاء السوائل والأدوية والدم"},
+        {"h":"اختيار المقاس","b":"16G رمادي: نقل دم، جراحة كبرى\n18G أخضر: معيار عام\n20G وردي: حالات اعتيادية\n22G أزرق: أطفال وكبار سن"},
+        {"h":"خطوات الإجراء","steps":["اشرح الإجراء واحصل على الموافقة","ضع الرباط 10-15 سم فوق الموضع","اطلب فتح وإغلاق اليد لإبراز الوريد","نظّف من الداخل للخارج بكحول 70%","ادخل الكانيولا 15-30° مع مراقبة الـ Flashback","بمجرد ظهور الدم: اخفض الزاوية وادفع البلاستيك","اضغط على الوريد أمام الكانيولا واسحب المعدن","ارفع الرباط وثبّت بضمادة شفافة","وثّق: التاريخ، المقاس، الموقع"]}
+       ],
+       "notes_ar":["غيّر الكانيولا كل 72-96 ساعة","احمرار + ألم + خط وريدي = Phlebitis، انزع فوراً"],
+       "danger_ar":"Infiltration: تورم بارد حول الموضع = السائل خارج الوريد. انزع الكانيولا فوراً",
+       "ref_ar":"Brunner & Suddarth Medical-Surgical Nursing 14th ed",
+       "quiz_ar":[
+        {"q":"أول علامة تؤكد دخول الكانيولا الوريد؟","ch":["ألم المريض","ظهور الدم في Flashback Chamber","سهولة الدفع","تورم الجلد"],"c":1,"e":"Flashback ملئان بالدم = دخول وريدي مؤكد. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"المقاس المناسب لنزيف حاد يحتاج نقل دم؟","ch":["24G","20G","16G","22G"],"c":2,"e":"16G يتيح تدفق دم سريع في الطوارئ. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"احمرار + ألم + دفء حول الكانيولا = ؟","ch":["طبيعي","Phlebitis التهاب وريدي","Hematoma","نزيف"],"c":1,"e":"Phlebitis: انزع الكانيولا وضع كمادة دافئة. المرجع: INS Infusion Nursing Standards"},
+        {"q":"متى يجب تغيير الكانيولا؟","ch":["24 ساعة","48 ساعة","72-96 ساعة","أسبوع"],"c":2,"e":"CDC و INS: كل 72-96 ساعة لمنع العدوى. المرجع: CDC Intravascular Catheter Guidelines"},
+        {"q":"تورم بارد حول الموضع دون احمرار = ؟","ch":["Phlebitis","Infiltration","Hematoma","تحسس"],"c":1,"e":"Infiltration = السائل في الأنسجة لا الوريد. انزع فوراً. المرجع: INS Infusion Nursing Standards"}
+       ]
+      }
+     ]
+    },
+    {"id":"crit","ar":"الرعاية الحرجة","en":"Critical Care","col":"rgba(224,85,85,.08)","stroke":"#e05555",
+     "procs":[
+      {"id":"cpr","ar":"CPR للبالغ BLS 2020","en":"Adult CPR BLS 2020","vid":"https://www.youtube.com/embed/cosVBV96E2g",
+       "sec_ar":[
+        {"h":"سلسلة النجاة","b":"1. التعرف المبكر + استدعاء المساعدة\n2. CPR مبكر عالي الجودة\n3. Defibrillation مبكر\n4. رعاية ACLS المتقدمة\n5. رعاية ما بعد الإنعاش"},
+        {"h":"خطوات BLS (AHA 2020)","steps":["تأكد من سلامة المنطقة","افحص الاستجابة: نادِ بصوت عالٍ + اهزّ الكتفين","اطلب مساعدة + AED فوراً","ابدأ الضغطات: ضع كعب يدك على مركز الصدر","عمق الضغط: 5-6 سم","المعدل: 100-120 ضغطة في الدقيقة","اسمح للصدر بالتمدد الكامل بين الضغطات","نسبة 30 ضغطة: 2 تنفس (بدون طريق هوائي متقدم)","قلّل الانقطاعات الى أقل من 10 ثوانٍ","استمر حتى: ROSC أو قرار طبي"]}
+       ],
+       "notes_ar":["الانقطاعات تقل = النتائج تتحسن","AED للـ Shockable rhythms فقط (VF, pVT)"],
+       "danger_ar":"كسر الضلوع ممكن الحدوث وهو مقبول. لا توقف CPR",
+       "ref_ar":"AHA BLS Provider Manual 2020",
+       "quiz_ar":[
+        {"q":"معدل ضغطات الصدر الصحيح في CPR وفق AHA 2020؟","ch":["60-80/دقيقة","100-120/دقيقة","120-140/دقيقة","80-100/دقيقة"],"c":1,"e":"100-120/دقيقة. المرجع: AHA BLS 2020"},
+        {"q":"عمق ضغطات الصدر للبالغ؟","ch":["2-3 سم","4-5 سم","5-6 سم","أكثر من 6 سم"],"c":2,"e":"5-6 سم. أقل يقلل النتاج، أكثر يزيد المضاعفات. المرجع: AHA BLS 2020"},
+        {"q":"نسبة ضغطات إلى تنفس بدون طريق هوائي متقدم؟","ch":["15:2","30:2","30:1","15:1"],"c":1,"e":"30:2 هي النسبة القياسية. المرجع: AHA BLS 2020"},
+        {"q":"متى يجوز إيقاف CPR؟","ch":["بعد 10 دقائق","عند ROSC أو قرار طبي","بعد 5 دقائق","عند تعب الممرض"],"c":1,"e":"CPR يستمر حتى ROSC أو قرار الطبيب. المرجع: AHA BLS 2020"},
+        {"q":"Full Recoil في CPR يعني؟","ch":["الضغط بقوة","السماح للصدر بالتمدد الكامل","رفع اليدين بالكامل","التنفس بين الضغطات"],"c":1,"e":"Full Recoil يسمح للقلب بالامتلاء = نتاج قلبي أفضل. المرجع: AHA BLS 2020"}
+       ]
+      }
+     ]
+    },
+    {"id":"obgyn","ar":"التوليد والنساء","en":"OB/GYN","col":"rgba(155,127,232,.08)","stroke":"#9b7fe8",
+     "procs":[
+      {"id":"pp","ar":"تقييم ما بعد الولادة BUBBLE-HE","en":"Postpartum BUBBLE-HE Assessment","vid":"https://www.youtube.com/embed/GK0dD2EfJkY",
+       "sec_ar":[
+        {"h":"نموذج BUBBLE-HE","b":"B = Breasts (الثديان)\nU = Uterus (الرحم)\nB = Bladder (المثانة)\nB = Bowel (الأمعاء)\nL = Lochia (النزيف المهبلي)\nE = Episiotomy/Incision\nH = Homans Sign (DVT)\nE = Emotions (الحالة النفسية)"},
+        {"h":"تقييم الرحم","steps":["قيّسي Fundus كل 4-8 ساعات","يجب أن يكون صلباً (Firm) كالبرتقالة","الموقع: عند السرة بعد الولادة، يتراجع 1 سم يومياً","انحراف للجانب = مثانة ممتلئة = أفرغي أولاً","رخو (Boggy) + نزيف = دلّكي الرحم + Oxytocin"]},
+        {"h":"Lochia الطبيعي","b":"Rubra: أحمر داكن، أيام 1-3\nSerosa: وردي/بني، أيام 4-10\nAlba: أبيض/كريمي، أيام 10-28"}
+       ],
+       "notes_ar":["Uterine Atony = السبب الأول لـ PPH","Lochia برائحة كريهة + حمى = Endometritis"],
+       "danger_ar":"PPH: نزيف أكثر من 500ml ولادة طبيعية أو 1000ml قيصري = طوارئ فورية",
+       "ref_ar":"Lowdermilk Maternity and Women's Health Nursing 11th ed",
+       "quiz_ar":[
+        {"q":"الرحم منحرف للجانب الأيمن. الإجراء الأول؟","ch":["دلّكي الرحم فوراً","أعطي Oxytocin","ساعدي المريضة على التبول","أبلغي الطبيب فوراً"],"c":2,"e":"انحراف = مثانة ممتلئة. إفراغ المثانة أولاً. المرجع: Lowdermilk Maternity 11th ed"},
+        {"q":"Lochia طبيعي في اليوم الثالث؟","ch":["Alba أبيض","Rubra أحمر داكن","إفراز أخضر","قطع دم كبيرة"],"c":1,"e":"Rubra أحمر طبيعي أيام 1-3. المرجع: Lowdermilk Maternity 11th ed"},
+        {"q":"نزيف أكثر من فوطة ممتلئة في الساعة؟","ch":["طبيعي","PPH تحتاج تدخلاً فورياً","Lochia Serosa","التهاب بسيط"],"c":1,"e":"1 فوطة تقريباً = 100ml. أكثر من فوطة/ساعة = PPH. المرجع: ACOG PPH Guidelines"},
+        {"q":"ساق يسرى متورمة مؤلمة بعد الولادة؟","ch":["تعب طبيعي","DVT Deep Vein Thrombosis","ألم عضلي","وذمة طبيعية"],"c":1,"e":"DVT حتى يثبت غيره. Doppler US فوري. المرجع: Lowdermilk Maternity 11th ed"},
+        {"q":"الدواء الأول لعلاج Uterine Atony؟","ch":["Methylergonovine","Oxytocin (Pitocin)","Misoprostol","Carboprost"],"c":1,"e":"Oxytocin هو الخط الأول. المرجع: ACOG PPH Guidelines"}
+       ]
+      }
+     ]
+    },
+    {"id":"peds","ar":"تمريض الأطفال","en":"Pediatrics","col":"rgba(212,146,42,.08)","stroke":"#d4922a",
+     "procs":[
+      {"id":"pa","ar":"تقييم الطفل PAT","en":"Pediatric Assessment PAT","vid":"https://www.youtube.com/embed/9x0e5yd3alI",
+       "sec_ar":[
+        {"h":"Pediatric Assessment Triangle","b":"A = Appearance: لون + نشاط + تواصل بصري\nB = Breathing: معدل + صرير + سحب\nC = Circulation: لون الجلد + Capillary Refill\n\nتقييم أولي خلال 60 ثانية بدون أدوات"},
+        {"h":"المؤشرات الحيوية الطبيعية","steps":["Neonate: HR 120-160 | RR 40-60","Infant 1-12m: HR 100-160 | RR 30-60","Toddler 1-3y: HR 90-150 | RR 24-40","School 6-12y: HR 70-120 | RR 18-30"]},
+        {"h":"مقاييس الألم","b":"Neonate: NIPS\nأقل من 3 سنوات: FLACC (0-10)\n3-12 سنة: Wong-Baker FACES\nأكثر من 12: Numeric 0-10"}
+       ],
+       "notes_ar":["الأطفال يُعوّضون حتى اللحظة الأخيرة ثم ينهارون فجأة","الحمى عند المولود أقل من 3 أشهر = طوارئ دائماً"],
+       "danger_ar":"Respiratory Failure = أكثر سبب لـ Cardiac Arrest عند الأطفال. راقب التنفس أولاً",
+       "ref_ar":"Wong's Nursing Care of Infants and Children 11th ed | PALS AHA",
+       "quiz_ar":[
+        {"q":"مقياس الألم لطفل 18 شهراً؟","ch":["Numeric 0-10","Wong-Baker FACES","FLACC Scale","VAS"],"c":2,"e":"FLACC للأطفال أقل من 3 سنوات. المرجع: Wong's Pediatric 11th ed"},
+        {"q":"معدل التنفس الطبيعي للرضيع؟","ch":["12-20","24-40","30-60","60-80"],"c":2,"e":"RR للرضيع 30-60/دقيقة. المرجع: Wong's Pediatric 11th ed"},
+        {"q":"المكوّن الأول في PAT؟","ch":["Breathing","Circulation","Appearance","Temperature"],"c":2,"e":"PAT تبدأ بـ Appearance. المرجع: PALS AHA Guidelines"},
+        {"q":"رضيع 3 أشهر بحمى 38.5. الإجراء الأول؟","ch":["أعطِ Paracetamol فقط","تقييم طبي طارئ","كمادات ماء بارد","مراقبة في المنزل"],"c":1,"e":"الحمى أقل من 3 أشهر = طوارئ. يحتاج تقييم Sepsis. المرجع: AAP Guidelines"},
+        {"q":"FLACC Score = 8 يعني؟","ch":["بلا ألم","ألم خفيف","ألم متوسط","ألم شديد يحتاج تدخل فوري"],"c":3,"e":"FLACC 7-10 = ألم شديد. تدخل دوائي فوري. المرجع: Wong's Pediatric 11th ed"}
+       ]
+      }
+     ]
+    },
+    {"id":"assess","ar":"الفحص والتقييم","en":"Assessment","col":"rgba(63,184,240,.08)","stroke":"#3fb8f0",
+     "procs":[
+      {"id":"htt","ar":"الفحص الجسدي Head-to-Toe","en":"Head-to-Toe Assessment","vid":"https://www.youtube.com/embed/ueHYvAAJ7_E",
+       "sec_ar":[
+        {"h":"ترتيب الفحص الجسدي","b":"I = Inspection (نظر)\nA = Auscultation (سمع)\nP = Percussion (قرع)\nP = Palpation (جس)\n\nالبطن: IAPP (السمع قبل القرع والجس)"},
+        {"h":"الرأس والرقبة","steps":["الحالة العقلية: A&O x4 (شخص، مكان، زمن، حدث)","العيون: PERRLA + حدة البصر","الأذنان: قناة السمع + اختبارات السمع","الأنف: تناظر + سالكية","الفم: أسنان + لثة + حلق","الرقبة: الغدد الليمفاوية + الدرقية + JVP"]},
+        {"h":"الصدر والقلب","steps":["معدل التنفس + تناظر الصدر","أصوات التنفس في 4 مناطق كل جانب","القلب في 4 مناطق: Aortic، Pulmonic، Tricuspid، Mitral","S1 = إغلاق MV+TV | S2 = إغلاق AV+PV","S3 = فشل قلبي | S4 = ارتفاع ضغط"]}
+       ],
+       "notes_ar":["في البطن: الاستماع قبل القرع والجس","PERRLA = Pupils Equal Round Reactive to Light and Accommodation"],
+       "danger_ar":"Rigidity + Rebound tenderness + حمى = طوارئ جراحية فورية",
+       "ref_ar":"Bates' Guide to Physical Examination 12th ed",
+       "quiz_ar":[
+        {"q":"الترتيب الصحيح لفحص البطن؟","ch":["نظر > جس > قرع > سمع","نظر > سمع > قرع > جس","سمع > نظر > قرع > جس","قرع > نظر > سمع > جس"],"c":1,"e":"IAPP في البطن. السمع قبل القرع والجس. المرجع: Bates Guide 12th ed"},
+        {"q":"S3 في القلب يشير إلى؟","ch":["ارتفاع ضغط","فشل قلبي احتقاني","التهاب التامور","تضيّق التاجي"],"c":1,"e":"S3 = فشل قلبي احتقاني. المرجع: Bates Physical Examination 12th ed"},
+        {"q":"PERRLA تعني؟","ch":["ضغط دم مرتفع","حدقتان متساويتان تتفاعلان للضوء","معدل قلب طبيعي","نتيجة اختبار التنفس"],"c":1,"e":"Pupils Equal Round Reactive to Light and Accommodation. المرجع: Bates Guide"},
+        {"q":"أصوات التنفس فوق القصبة الهوائية؟","ch":["Vesicular","Bronchovesicular","Bronchial/Tracheal","Crackles"],"c":2,"e":"Bronchial/Tracheal فوق القصبة. المرجع: Bates Guide 12th ed"},
+        {"q":"Rigidity + Rebound tenderness + حمى = ؟","ch":["أعطِ مسكناً وراقب","طوارئ جراحية أبلغ الطبيب فوراً","أعطِ سوائل وراقب","تحليل دم فقط"],"c":1,"e":"Peritonitis أو طوارئ جراحية. تدخل فوري. المرجع: Brunner & Suddarth 14th ed"}
+       ]
+      }
+     ]
+    },
+    {"id":"comm","ar":"الصحة المجتمعية","en":"Community Health","col":"rgba(46,204,138,.08)","stroke":"#2ecc8a",
+     "procs":[
+      {"id":"tb","ar":"التثقيف الصحي Teach-Back","en":"Health Education Teach-Back","vid":"https://www.youtube.com/embed/GDzXbqiCnT0",
+       "sec_ar":[
+        {"h":"مبادئ التثقيف الفعّال","b":"Grade 6 reading level (مستوى الصف السادس)\nتجنّب المصطلحات بدون شرح\nقسّم المعلومات إلى وحدات صغيرة\nقيّم مستوى الإلمام الصحي أولاً"},
+        {"h":"Teach-Back Method","steps":["اشرح المعلومة بجملتين بسيطتين","قل: أريد التأكد من أنني شرحت بوضوح، أخبرني بما ستفعله","استمع دون مقاطعة","صحّح المفاهيم الخاطئة بدون إحراج","كرر حتى الفهم الكامل","وثّق مستوى الفهم في الملف"]}
+       ],
+       "notes_ar":["سؤال هل فهمت؟ = 90% يقولون نعم حتى لو لم يفهموا","Teach-Back = اختبار الشرح وليس اختبار المريض"],
+       "danger_ar":"تثقيف سطحي = عدم امتثال = إعادة دخول = تدهور",
+       "ref_ar":"Potter & Perry Fundamentals 10th ed | AHRQ Health Literacy Guidelines",
+       "quiz_ar":[
+        {"q":"أفضل طريقة للتحقق من فهم المريض؟","ch":["سؤاله هل فهمت؟","Teach-Back: اطلب منه شرح ما فهمه","إعطاؤه كتيّباً","إشراك الأسرة فقط"],"c":1,"e":"Teach-Back هي الأكثر فعالية. المرجع: AHRQ Health Literacy"},
+        {"q":"أيّ صياغة تعكس Teach-Back صحيح؟","ch":["أتمنى أن تكون فهمت","أريد أن أتأكد أنني شرحت بوضوح، أخبرني بما ستفعله","هل لديك أسئلة؟","اقرأ الكتيّب"],"c":1,"e":"الصياغة تُحمّل المسؤولية على الممرض لا المريض. المرجع: AHRQ"},
+        {"q":"مستوى القراءة الأنسب لمواد التثقيف؟","ch":["جامعي","ثانوي","الصف السادس Grade 6","أي مستوى"],"c":2,"e":"Grade 6 لضمان فهم معظم المرضى. المرجع: WHO Health Literacy 2013"},
+        {"q":"متى يُكرر الممرض الشرح؟","ch":["دائماً مرة واحدة","عندما يُجيب المريض بمعلومة خاطئة","كل 30 دقيقة","عند طلب المريض فقط"],"c":1,"e":"إجابة خاطئة = أعد الشرح + Teach-Back مجدداً. المرجع: Potter & Perry 10th ed"},
+        {"q":"عوامل تُقلل استيعاب المريض؟","ch":["الهدوء والراحة","الألم والقلق والتعب","حضور الأسرة","الكتيّبات المصوّرة"],"c":1,"e":"الألم والقلق يقللان التركيز. المرجع: Potter & Perry Fundamentals 10th ed"}
+       ]
+      }
+     ]
+    },
+    {"id":"mental","ar":"الصحة النفسية","en":"Mental Health","col":"rgba(155,127,232,.08)","stroke":"#9b7fe8",
+     "procs":[
+      {"id":"mse","ar":"الفحص النفسي MSE","en":"Mental Status Examination","vid":"https://www.youtube.com/embed/7GpzD6Vvuxs",
+       "sec_ar":[
+        {"h":"مكوّنات MSE","b":"A = Appearance (مظهر: ملابس، نظافة)\nB = Behavior (سلوك: تعاون، إثارة)\nC = Cognition (إدراك: ذاكرة، تركيز)\nD = Delusions/Mood (معتقدات، مزاج)\nE = Emotions (مناسبة المشاعر)\nF = Function (القدرة على المهام اليومية)"},
+        {"h":"MMSE","b":"30 نقطة كحد أقصى\n24-30: طبيعي\n18-23: خفيف-متوسط\nأقل من 18: شديد"},
+        {"h":"تقييم خطر الانتحار C-SSRS","steps":["اسأل مباشرة: هل تفكر في إنهاء حياتك؟","Columbia Scale: فكرة (1) > نية (2) > خطة (3) > وسيلة (4) > محاولة (5)","الدرجة 3 وأكثر = تدخل فوري","أزِل الوسائل الخطرة فوراً"]}
+       ],
+       "notes_ar":["سؤال الانتحار لا يُغرس الفكرة، التقييم المبكر ينقذ","تحسّن مفاجئ في مريض اكتئاب + توزيع ممتلكات = خطر عالٍ"],
+       "danger_ar":"مريض بخطة + وسيلة + وقت = خطورة عالية = 1:1 observation + إشعار الطبيب",
+       "ref_ar":"Stuart's Principles and Practice of Psychiatric Nursing 11th ed",
+       "quiz_ar":[
+        {"q":"مريض يعرف اسمه والمستشفى لكن لا يعرف التاريخ. كيف يُوثَّق؟","ch":["A&O x4","A&O x2 (Person, Place)","Comatose","Confused x1"],"c":1,"e":"يعرف Person + Place لكن لا Time = A&O x2. المرجع: Stuart's Psychiatric Nursing 11th ed"},
+        {"q":"MMSE = 15 يعني؟","ch":["طبيعي","خفيف","متوسط-شديد","طبيعي تماماً"],"c":2,"e":"10-17 = Moderate-Severe Cognitive Impairment. المرجع: Folstein MMSE"},
+        {"q":"C-SSRS: مريض قال لديه حبوب ونوى يأخذها الليلة. الدرجة؟","ch":["Score 1","Score 3-4","Score 5 محاولة جارية","Score 0"],"c":1,"e":"فكرة + خطة + وسيلة = Level 3-4. تدخل فوري. المرجع: Columbia Suicide Rating Scale"},
+        {"q":"أكثر أماناً لمريض انتحاري؟","ch":["غرفة بها أشياء حادة","Ligature-free مع مراقبة 1:1","المنزل مع الأسرة","جناح عام"],"c":1,"e":"Ligature-free + 1:1 أساسيان. المرجع: Stuart's Psychiatric Nursing 11th ed"},
+        {"q":"تحسّن مفاجئ + توزيع ممتلكات في مريض اكتئاب؟","ch":["تعافٍ حقيقي","علامة خطر، قرر الانتحار","أثر الدواء الإيجابي","مزاج جيد"],"c":1,"e":"Resolving reasons to live = قرار الانتحار. المرجع: Stuart's Psychiatric Nursing 11th ed"}
+       ]
+      }
+     ]
+    },
+    {"id":"adult","ar":"الجراحة والباطنة","en":"Adult Med-Surg","col":"rgba(46,204,138,.08)","stroke":"#2ecc8a",
+     "procs":[
+      {"id":"wd","ar":"تغيير ضمادة الجرح الجراحي","en":"Surgical Wound Dressing","vid":"https://www.youtube.com/embed/eE2u1tz4Sow",
+       "sec_ar":[
+        {"h":"تقييم الجرح REEDA","b":"R = Redness (احمرار)\nE = Edema (تورم)\nE = Ecchymosis (كدمات)\nD = Discharge (إفراز)\nA = Approximation (التصاق الحواف)\n\nكل معيار 0-3 = الإجمالي 0-15"},
+        {"h":"خطوات تغيير الضمادة","steps":["تحقق من أمر الطبيب ونوع الضمادة","اشرح الإجراء واضمن الخصوصية","قفازات غير معقمة لإزالة الضمادة القديمة","قيّم الجرح بـ REEDA ووثّق","قفازات معقمة Sterile gloves","نظّف من وسط الجرح للخارج (Inside-Out)","ضع الضمادة المناسبة","ثبّت ووثّق: REEDA score، اللون، الحجم"]}
+       ],
+       "notes_ar":["تغيير الضمادة الجراحية = Sterile Technique طوال الوقت","Serosanguineous (وردي صافٍ) طبيعي في أيام 1-3"],
+       "danger_ar":"Evisceration (خروج أحشاء) = طوارئ. غطِّ بـ NS مبلل + لا تُعد + اتصل بالجراح",
+       "ref_ar":"Brunner & Suddarth Medical-Surgical Nursing 14th ed",
+       "quiz_ar":[
+        {"q":"الحد الأقصى لنتيجة REEDA؟","ch":["5","10","15","20"],"c":2,"e":"5 معايير × 3 = 15 كحد أقصى. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"اتجاه تنظيف الجرح الجراحي؟","ch":["خارج للداخل","داخل للخارج Inside-Out","أي اتجاه","دائرياً فقط"],"c":1,"e":"Inside-Out لمنع نقل الجراثيم للجرح. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"إفراز أصفر كثيف + احمرار + حرارة = ؟","ch":["Serous طبيعي","Serosanguineous","SSI Surgical Site Infection","Hematoma"],"c":2,"e":"Purulent + احمرار + حرارة = SSI. المرجع: CDC SSI Guidelines"},
+        {"q":"خروج أمعاء من الجرح (Evisceration). الإجراء الأول؟","ch":["أعِد الأمعاء للبطن","غطِّ بـ NS دافئ + لا تُعد + اتصل بالجراح","نظّف بالبيتادين","ضمادة جافة فقط"],"c":1,"e":"Evisceration = طوارئ. لا تُعد الأمعاء. المرجع: Brunner & Suddarth 14th ed"},
+        {"q":"Primary Intention Healing تعني؟","ch":["الجرح يلتئم من القاع","تأخير الإغلاق المتعمد","حواف الجرح ملتصقة مباشرة","التئام بالتضخم"],"c":2,"e":"Primary = حواف ملتصقة (شقوق نظيفة). المرجع: Brunner & Suddarth 14th ed"}
+       ]
+      }
+     ]
+    }
+  ]
+}
+</script>
+
+<!-- LANGUAGE SCREEN -->
+
+<div id="LS">
+  <div class="ls-bg"></div>
+  <div class="ls-z">
+    <div class="ls-badge"><div class="ls-dot"></div>Professional Medical AI</div>
+    <div class="ls-icon">
+      <svg viewBox="0 0 44 44" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="22" cy="22" r="18" stroke="rgba(0,212,180,.4)" fill="rgba(0,212,180,.06)"/>
+        <path d="M22 12v20M12 22h20"/>
+        <circle cx="22" cy="22" r="5" stroke="rgba(0,212,180,.6)" fill="rgba(0,212,180,.1)"/>
+      </svg>
+    </div>
+    <div class="ls-title">الممرض <span>الافتراضي</span></div>
+    <div class="ls-sub">NurseAI Pro — مساعد تمريضي احترافي</div>
+    <div class="ls-div">
+      <div class="ls-div-line"></div>
+      <span>اختر لغتك — Choose your language</span>
+      <div class="ls-div-line"></div>
+    </div>
+    <div class="ls-cards">
+      <div class="ls-card" id="btn-ar">
+        <div class="flag">🇸🇦</div>
+        <div class="ln2">عربي</div>
+        <div class="ls2">Arabic</div>
+      </div>
+      <div class="ls-card" id="btn-en">
+        <div class="flag">🇬🇧</div>
+        <div class="ln2">English</div>
+        <div class="ls2">الإنجليزية</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+
+<div id="APP">
+  <div class="sb">
+    <div class="sb-brand" id="brandBtn">
+      <svg viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.5" stroke-linecap="round">
+        <circle cx="10" cy="10" r="8" fill="rgba(255,255,255,.1)"/>
+        <path d="M10 5v10M5 10h10"/>
+      </svg>
+    </div>
+    <div class="sb-sep"></div>
+    <button class="nv on" id="nv-dash"><svg viewBox="0 0 20 20"><path d="M3 10.5L10 4l7 6.5V17H13v-4h-6v4H3v-6.5z"/></svg><span class="tip" id="tip-dash">الرئيسية</span></button>
+    <button class="nv" id="nv-chat"><svg viewBox="0 0 20 20"><path d="M17 3H3a1 1 0 00-1 1v9a1 1 0 001 1h2v3l4-3h8a1 1 0 001-1V4a1 1 0 00-1-1z"/></svg><span class="tip" id="tip-chat">الممرض</span></button>
+    <button class="nv" id="nv-drugs"><svg viewBox="0 0 20 20"><path d="M10 2a3 3 0 013 3v.5h1a2 2 0 012 2V15a2 2 0 01-2 2H6a2 2 0 01-2-2V7.5a2 2 0 012-2h1V5a3 3 0 013-3zm0 2a1 1 0 00-1 1v.5h2V5a1 1 0 00-1-1z"/></svg><span class="tip" id="tip-drugs">الأدوية</span></button>
+    <button class="nv" id="nv-dose"><svg viewBox="0 0 20 20"><path d="M5 2h10l1 4H4L5 2zm-1 5h12l-1 11H6L4 7z"/></svg><span class="tip" id="tip-dose">الجرعات</span></button>
+    <button class="nv" id="nv-quiz"><svg viewBox="0 0 20 20"><rect x="2" y="2" width="16" height="16" rx="2"/><path d="M6 7h8M6 10h5M6 13h6"/></svg><span class="tip" id="tip-quiz">الاختبارات</span></button>
+    <button class="nv" id="nv-proc"><svg viewBox="0 0 20 20"><path d="M4 3h12v14H4z"/><path d="M7 8l2 2 4-4M7 13h6"/></svg><span class="tip" id="tip-proc">الإجراءات</span></button>
+    <div class="sb-bot">
+      <button class="nv" id="nv-vitals"><svg viewBox="0 0 20 20"><path d="M2 10h3l2-5 3 10 2-7 2 2h4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span class="tip" id="tip-vitals">العلامات</span></button>
+      <div class="sb-sep"></div>
+      <button class="api-btn" id="apiBtn">
+        <svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="4"/><path d="M6 12c-2.5.5-4 2-4 3h16c0-1-1.5-2.5-4-3"/></svg>
+        <div class="api-ind" id="apiInd"></div>
+        <span class="api-tip">API Key</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="api-pop" id="apiPop">
+    <h4>Groq API Key</h4>
+    <input type="password" id="apiIn" placeholder="gsk_...">
+    <div class="api-pop-row">
+      <div class="api-pop-dot" id="apd"></div>
+      <span class="api-pop-txt" id="apt"></span>
+    </div>
+    <p>console.groq.com</p>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="tb-info"><h2 id="pgT">لوحة التحكم</h2><p id="pgS">NurseAI Pro</p></div>
+      <div class="tb-right"><div class="lchip" id="langChip"><span id="lfl">🇸🇦</span><span id="lnm">عربي</span></div></div>
+    </div>
+    <div class="content">
+
+```
+  <!-- DASHBOARD -->
+  <div class="vw on" id="vw-dash">
+    <div class="scr">
+      <div class="hero">
+        <div class="hero-lbl">الممرض الافتراضي — NurseAI Pro</div>
+        <div class="hero-ttl" id="hT">مساعدك التمريضي الاحترافي</div>
+        <div class="hero-desc" id="hD">يجيب بناءً على أقوى المراجع التمريضية العالمية فقط</div>
+        <div class="hero-refs">
+          <span class="rpill">NCLEX-RN</span><span class="rpill">WHO</span><span class="rpill">Mosby's</span><span class="rpill">Brunner & Suddarth</span><span class="rpill">Potter & Perry</span><span class="rpill">AHA BLS 2020</span><span class="rpill">Lowdermilk</span><span class="rpill">Wong's</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="sc"><div class="sv" id="s1">0</div><div class="sl">رسائل</div></div>
+        <div class="sc"><div class="sv" id="s2">0</div><div class="sl">أسئلة</div></div>
+        <div class="sc"><div class="sv" id="s3">—</div><div class="sl">النجاح</div></div>
+      </div>
+      <div class="shr" id="qaH">وصول سريع</div>
+      <div class="qag">
+        <div class="qa" id="qa1"><div class="qa-ic" style="background:rgba(0,212,180,.08);"><svg viewBox="0 0 20 20" fill="var(--em)"><path d="M17 3H3a1 1 0 00-1 1v9a1 1 0 001 1h2v3l4-3h8a1 1 0 001-1V4a1 1 0 00-1-1z"/></svg></div><div><h4 id="qa1t">الممرض الافتراضي</h4><p id="qa1s">اسأل بأي لغة</p></div></div>
+        <div class="qa" id="qa2"><div class="qa-ic" style="background:rgba(63,184,240,.08);"><svg viewBox="0 0 20 20" fill="var(--blue)"><path d="M10 2a3 3 0 013 3v.5h1a2 2 0 012 2V15a2 2 0 01-2 2H6a2 2 0 01-2-2V7.5a2 2 0 012-2h1V5a3 3 0 013-3z"/></svg></div><div><h4 id="qa2t">موسوعة الأدوية</h4><p id="qa2s">أي دواء في العالم</p></div></div>
+        <div class="qa" id="qa3"><div class="qa-ic" style="background:rgba(155,127,232,.08);"><svg viewBox="0 0 20 20" fill="var(--purple)"><path d="M4 3h12v14H4z"/></svg></div><div><h4 id="qa3t">الإجراءات</h4><p id="qa3s">شرح + فيديو + كويز</p></div></div>
+        <div class="qa" id="qa4"><div class="qa-ic" style="background:rgba(212,146,42,.08);"><svg viewBox="0 0 20 20" fill="var(--amber)"><path d="M5 2h10l1 4H4L5 2zm-1 5h12l-1 11H6L4 7z"/></svg></div><div><h4 id="qa4t">حاسبة الجرعات</h4><p id="qa4s">AI يحسب أي جرعة</p></div></div>
+      </div>
+      <div class="shr" id="sqH">أسئلة شائعة</div>
+      <div class="dash-chips" id="dChips"></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="vw" id="vw-chat">
+    <div class="cw">
+      <div class="cm" id="cm">
+        <div class="cwelcome" id="cwelcome">
+          <div class="cw-ic"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="12"/><path d="M15 9v12M9 15h12" stroke-linecap="round"/></svg></div>
+          <div class="cw-t" id="cwT">الممرض الافتراضي</div>
+          <div class="cw-s" id="cwS">اسألني أي سؤال تمريضي</div>
+        </div>
+      </div>
+      <div class="ccr" id="ccr"></div>
+      <div class="cia">
+        <button class="send" id="sendBtn"><svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5"/></svg></button>
+        <textarea class="cta" id="ci" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();doSend();}"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- DRUGS -->
+  <div class="vw" id="vw-drugs">
+    <div class="scr">
+      <div class="card">
+        <div class="ch"><div class="ci" style="background:rgba(63,184,240,.08);"><svg viewBox="0 0 20 20" fill="var(--blue)" width="17" height="17"><path d="M10 2a3 3 0 013 3v.5h1a2 2 0 012 2V15a2 2 0 01-2 2H6a2 2 0 01-2-2V7.5a2 2 0 012-2h1V5a3 3 0 013-3z"/></svg></div><div><div class="ct">موسوعة الأدوية</div><div class="cs">أي دواء في العالم</div></div></div>
+        <div class="cb">
+          <input type="text" class="inp" id="drugQ" style="direction:auto;">
+          <div style="height:8px;"></div>
+          <button class="btn" id="drugBtn">بحث في الموسوعة</button>
+        </div>
+      </div>
+      <div class="loading" id="drugLoad"><div class="sp-lg"></div><p id="drugLoadT">جاري البحث...</p></div>
+      <div class="rbox" id="drugRes"></div>
+    </div>
+  </div>
+
+  <!-- DOSE -->
+  <div class="vw" id="vw-dose">
+    <div class="scr">
+      <div class="dtabs">
+        <button class="dtab on" onclick="swDose('ai',this)" id="dtab-ai">حساب بالذكاء الاصطناعي</button>
+        <button class="dtab" onclick="swDose('mgkg',this)" id="dtab-mgkg">حاسبة mg/kg</button>
+        <button class="dtab" onclick="swDose('iv',this)" id="dtab-iv">IV Rate</button>
+      </div>
+      <div class="dpanel on" id="dp-ai">
+        <div class="card">
+          <div class="ch"><div class="ci" style="background:rgba(0,212,180,.08);"><svg viewBox="0 0 20 20" fill="none" stroke="var(--em)" stroke-width="1.5" width="17" height="17"><circle cx="10" cy="10" r="8"/><path d="M7 10l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="ct">الحساب الذكي</div><div class="cs">AI يحسب من المراجع الصيدلانية</div></div></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label class="lbl">اسم الدواء</label><input type="text" class="inp" id="aiDrug" placeholder="Vancomycin..." style="direction:auto;"></div>
+              <div class="fg"><label class="lbl">الوزن (kg)</label><input type="number" class="inp" id="aiWt" placeholder="70" min="1"></div>
+              <div class="fg"><label class="lbl">الفئة</label><select class="inp" id="aiCat"><option value="adult">بالغ Adult</option><option value="pediatric">طفل Pediatric</option><option value="neonate">مولود Neonate</option><option value="elderly">مسن Elderly</option><option value="renal">قصور كلوي</option><option value="hepatic">قصور كبدي</option></select></div>
+              <div class="fg"><label class="lbl">جرعة مطلوبة (mg/kg) اختياري</label><input type="number" class="inp" id="aiMgKg" placeholder="10" step="0.1"></div>
+            </div>
+            <div class="fg" style="margin-bottom:10px;"><label class="lbl">ملاحظات إضافية</label><textarea class="inp" id="aiNotes" rows="2" placeholder="التركيز المتاح، الاستخدام..."></textarea></div>
+            <button class="btn" id="aiBt">احسب من المراجع</button>
+          </div>
+        </div>
+        <div class="loading" id="aiLoad"><div class="sp-lg"></div><p id="aiLoadT">جاري الحساب...</p></div>
+        <div class="rbox" id="aiRes"></div>
+      </div>
+      <div class="dpanel" id="dp-mgkg">
+        <div class="card">
+          <div class="ch"><div class="ci" style="background:rgba(212,146,42,.08);"><svg viewBox="0 0 20 20" fill="var(--amber)" width="17" height="17"><path d="M5 2h10l1 4H4L5 2zm-1 5h12l-1 11H6L4 7z"/></svg></div><div><div class="ct">حاسبة mg/kg</div><div class="cs">الجرعة الوزنية</div></div></div>
+          <div class="cb">
+            <div class="g2">
+              <div class="fg"><label class="lbl">الدواء</label>
+                <select class="inp" id="mkDrug">
+                  <option value="">اختر...</option>
+                  <option value="paracetamol:10:15:1000:q4-6h">Paracetamol 10-15mg/kg</option>
+                  <option value="ibuprofen:5:10:400:q6-8h">Ibuprofen 5-10mg/kg</option>
+                  <option value="amoxicillin:25:50:500:q8h">Amoxicillin 25-50mg/kg</option>
+                  <option value="amikacin:15:22:1500:q24h">Amikacin 15-22mg/kg</option>
+                  <option value="gentamicin:5:7:360:q24h">Gentamicin 5-7mg/kg</option>
+                  <option value="vancomycin:15:20:2000:q6-12h">Vancomycin 15-20mg/kg</option>
+                  <option value="morphine:0.1:0.2:10:q4h">Morphine 0.1-0.2mg/kg</option>
+                  <option value="cefazolin:25:100:2000:q8h">Cefazolin 25-100mg/kg</option>
+                  <option value="metronidazole:7.5:15:500:q8h">Metronidazole 7.5mg/kg</option>
+                  <option value="dexamethasone:0.15:0.6:10:q6h">Dexamethasone 0.15mg/kg</option>
+                  <option value="ondansetron:0.1:0.15:8:q8h">Ondansetron 0.1-0.15mg/kg</option>
+                  <option value="heparin:80:80:10000:IV bolus">Heparin 80u/kg IV</option>
+                </select>
+              </div>
+              <div class="fg"><label class="lbl">الوزن (kg)</label><input type="number" class="inp" id="mkWt" placeholder="70" min="0.5"></div>
+              <div class="fg"><label class="lbl">الجرعة (mg/kg)</label><input type="number" class="inp" id="mkDose" placeholder="10" step="0.1"></div>
+              <div class="fg"><label class="lbl">التركيز (mg/ml) اختياري</label><input type="number" class="inp" id="mkConc" placeholder="50" step="0.1"></div>
+            </div>
+            <button class="btn" onclick="calcMK()">احسب الجرعة</button>
+            <div class="dres" id="mkRes"></div>
+          </div>
+        </div>
+      </div>
+      <div class="dpanel" id="dp-iv">
+        <div class="card">
+          <div class="ch"><div class="ci" style="background:rgba(63,184,240,.08);"><svg viewBox="0 0 20 20" fill="none" stroke="var(--blue)" stroke-width="1.5" width="17" height="17" stroke-linecap="round"><path d="M10 3v4M7 7h6l-1 10H8L7 7z"/></svg></div><div><div class="ct">معدل التسريب IV Rate</div><div class="cs">حاسبة الـ IV Flow Rate</div></div></div>
+          <div class="cb">
+            <div class="g3">
+              <div class="fg"><label class="lbl">الحجم (ml)</label><input type="number" class="inp" id="ivVol" placeholder="500"></div>
+              <div class="fg"><label class="lbl">المدة (ساعة)</label><input type="number" class="inp" id="ivHrs" placeholder="8" step="0.5"></div>
+              <div class="fg"><label class="lbl">عامل التقطير</label><select class="inp" id="ivDrop"><option value="20">Macro 20</option><option value="15">Macro 15</option><option value="60">Micro 60</option></select></div>
+            </div>
+            <button class="btn" onclick="calcIV()">احسب</button>
+            <div class="dres" id="ivRes"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="vw" id="vw-quiz">
+    <div class="scr">
+      <div class="card">
+        <div class="cb">
+          <div class="tgrid" id="tgrid">
+            <button class="tb on" data-t="general">تمريض عام</button>
+            <button class="tb" data-t="pharma">أدوية</button>
+            <button class="tb" data-t="anatomy">تشريح</button>
+            <button class="tb" data-t="critical">رعاية حرجة</button>
+            <button class="tb" data-t="pediatric">أطفال</button>
+            <button class="tb" data-t="nclex">NCLEX</button>
+          </div>
+          <button class="btn" id="qBtn">سؤال جديد</button>
+        </div>
+      </div>
+      <div class="srow" id="srow" style="display:none;">
+        <div class="sbdg"><span id="scl">صح</span>: <b id="scR">0</b></div>
+        <div class="sbdg"><span id="swl">غلط</span>: <b id="scW">0</b></div>
+        <div class="sbdg"><span id="spl">النسبة</span>: <b id="scP">—</b></div>
+      </div>
+      <div class="qbox" id="qbox">
+        <div class="qnum" id="qNum">Q#1</div>
+        <div class="qtext" id="qText"></div>
+        <div class="qchs" id="qChs"></div>
+        <div class="qexp" id="qExp"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROCEDURES -->
+  <div class="vw" id="vw-proc">
+    <div class="scr" id="procScr"></div>
+  </div>
+
+  <!-- VITALS -->
+  <div class="vw" id="vw-vitals">
+    <div class="scr">
+      <div class="shr">تقييم العلامات الحيوية</div>
+      <div class="vg">
+        <div class="vc"><label>HR (bpm)</label><input type="number" class="vi" id="vHR" placeholder="72" oninput="ckv('hr',this.value)"><div class="vs" id="vs-hr"></div></div>
+        <div class="vc"><label>RR (/min)</label><input type="number" class="vi" id="vRR" placeholder="16" oninput="ckv('rr',this.value)"><div class="vs" id="vs-rr"></div></div>
+        <div class="vc"><label>Temp (°C)</label><input type="number" class="vi" id="vT" placeholder="37.0" step="0.1" oninput="ckv('temp',this.value)"><div class="vs" id="vs-temp"></div></div>
+        <div class="vc"><label>SpO2 (%)</label><input type="number" class="vi" id="vSp" placeholder="98" oninput="ckv('spo2',this.value)"><div class="vs" id="vs-spo2"></div></div>
+        <div class="vc" style="grid-column:span 2;"><label>BP (mmHg)</label>
+          <div style="display:flex;gap:7px;align-items:center;">
+            <input type="number" class="vi" id="vSys" placeholder="SYS 120" style="flex:1;" oninput="ckv('bp',null)">
+            <span style="color:var(--tx3);font-size:14px;font-weight:700;">/</span>
+            <input type="number" class="vi" id="vDia" placeholder="DIA 80" style="flex:1;" oninput="ckv('bp',null)">
+          </div>
+          <div class="vs" id="vs-bp"></div>
+        </div>
+        <div class="vc"><label>GCS</label><input type="number" class="vi" id="vGCS" placeholder="15" min="3" max="15" oninput="ckv('gcs',this.value)"><div class="vs" id="vs-gcs"></div></div>
+        <div class="vc"><label>Glucose (mg/dL)</label><input type="number" class="vi" id="vBG" placeholder="100" oninput="ckv('bg',this.value)"><div class="vs" id="vs-bg"></div></div>
+      </div>
+      <div class="card"><div class="cb">
+        <div class="shr" style="margin-bottom:9px;">النطاقات الطبيعية</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px 14px;font-size:12px;line-height:2.1;color:var(--tx2);">
+          <div>HR: <b style="color:var(--tx);">60-100</b></div><div>RR: <b style="color:var(--tx);">12-20</b></div>
+          <div>Temp: <b style="color:var(--tx);">36.5-37.5</b></div><div>SpO2: <b style="color:var(--tx);">95%+</b></div>
+          <div>SBP: <b style="color:var(--tx);">90-140</b></div><div>DBP: <b style="color:var(--tx);">60-90</b></div>
+          <div>GCS: <b style="color:var(--tx);">13-15</b></div><div>Glucose: <b style="color:var(--tx);">70-110</b></div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+</div>
+```
+
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+
+var D = JSON.parse(document.getElementById('D').textContent);
+
+
+var S = {key:'', lang:'ar', apiOpen:false, hist:[], msgs:0, qN:0, qR:0, qW:0, qAns:false, qTopic:'general'};
+var GROQ = 'https://api.groq.com/openai/v1/chat/completions';
+var MODEL = 'llama-3.3-70b-versatile';
+
+
+function esc(t){ return t?String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+function $(id){ return document.getElementById(id); }
+function setText(id,t){ var el=$(id); if(el)el.textContent=t; }
+function get(id){ var el=$(id); return el?el.value.trim():''; }
+
+
+function getLang(){ return D['lang_'+S.lang]; }
+
+
+function launch(lang){
+  S.lang = lang;
+  var ls = document.getElementById('LS');
+  ls.classList.add('gone');
+  var app = document.getElementById('APP');
+  app.classList.add('show');
+  document.documentElement.dir = lang==='ar'?'rtl':'ltr';
+  document.documentElement.lang = lang;
+  applyLang();
+  buildProcCats();
+  buildTopicBtns();
+}
+
+document.getElementById('btn-ar').onclick = function(){ launch('ar'); };
+document.getElementById('btn-en').onclick = function(){ launch('en'); };
+
+function applyLang(){
+  var L = getLang();
+  $('lfl').textContent = L.flag;
+  $('lnm').textContent = L.fname;
+  $('ci').placeholder = L.chatPH;
+  setText('cwT', L.cwt);
+  setText('cwS', L.cws);
+  // Chat chips
+  var ccr = $('ccr'); ccr.innerHTML = '';
+  L.chatChips.forEach(function(c){
+    var btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = c;
+    btn.onclick = function(){ quickAsk(c); };
+    ccr.appendChild(btn);
+  });
+  // Dash chips
+  var dc = $('dChips'); dc.innerHTML = '';
+  L.dashChips.forEach(function(c){
+    var btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = c.length > 30 ? c.substring(0,28)+'...' : c;
+    btn.onclick = function(){ quickAsk(c); };
+    dc.appendChild(btn);
+  });
+  // Sidebar tips
+  var tips = S.lang==='ar'?
+    D.lang_ar.sidebar_tips:
+    {dash:'Dashboard',chat:'Virtual Nurse',drugs:'Drugs',dose:'Dose',quiz:'Quiz',proc:'Procedures',vitals:'Vitals'};
+  Object.keys(tips).forEach(function(k){ setText('tip-'+k, tips[k]); });
+  setText('apt', L.apiStatus.empty);
+  // Drug input
+  $('drugQ').placeholder = L.drugPH;
+  $('drugBtn').textContent = L.searchDrug;
+  $('aiBt').textContent = L.calcBtn;
+  $('qBtn').textContent = L.newQ;
+}
+
+
+var PM = {ar:D.lang_ar.pages, en:D.lang_en.pages};
+
+function navTo(pg){
+  document.querySelectorAll('.vw').forEach(function(v){ v.classList.remove('on'); });
+  document.querySelectorAll('.nv[id^="nv-"]').forEach(function(b){ b.classList.remove('on'); });
+  var vw = $('vw-'+pg); if(vw) vw.classList.add('on');
+  var nv = $('nv-'+pg); if(nv) nv.classList.add('on');
+  var m = PM[S.lang][pg];
+  if(m){ setText('pgT',m[0]); setText('pgS',m[1]); }
+  if(S.apiOpen) toggleApi();
+}
+
+['dash','chat','drugs','dose','quiz','proc','vitals'].forEach(function(pg){
+  var btn = $('nv-'+pg);
+  if(btn) btn.onclick = function(){ navTo(pg); };
+});
+$('brandBtn').onclick = function(){ navTo('dash'); };
+
+// Quick access
+$('qa1').onclick = function(){ navTo('chat'); };
+$('qa2').onclick = function(){ navTo('drugs'); };
+$('qa3').onclick = function(){ navTo('proc'); };
+$('qa4').onclick = function(){ navTo('dose'); };
+
+$('langChip').onclick = function(){
+  document.getElementById('LS').classList.remove('gone');
+  document.getElementById('APP').classList.remove('show');
+};
+
+
+function toggleApi(){
+  S.apiOpen = !S.apiOpen;
+  $('apiPop').classList.toggle('open', S.apiOpen);
+}
+$('apiBtn').onclick = function(e){ e.stopPropagation(); toggleApi(); };
+document.addEventListener('click', function(e){
+  if(S.apiOpen && !e.target.closest('.api-pop') && !e.target.closest('.api-btn')) toggleApi();
+});
+$('apiIn').oninput = function(){
+  S.key = this.value.trim();
+  var L = getLang();
+  if(S.key.startsWith('gsk_') && S.key.length > 20){
+    setDots('ok'); setText('apt', L.apiStatus.ok);
+    try{ localStorage.setItem('naik', S.key); }catch(e){}
+  } else if(S.key.length > 3){
+    setDots('err'); setText('apt', L.apiStatus.err);
+  } else {
+    setDots(''); setText('apt', L.apiStatus.empty);
+  }
+};
+function setDots(s){
+  ['apiInd','apd'].forEach(function(id){
+    var el=$(id); if(!el)return;
+    el.className = id==='apiInd'?'api-ind':'api-pop-dot';
+    if(s==='ok')el.classList.add('ok');
+    else if(s==='err')el.classList.add('err');
+  });
+}
+
+
+async function callGroq(msgs, temp, maxTok){
+  temp = temp || 0.15; maxTok = maxTok || 1400;
+  if(!S.key) throw new Error(getLang().noKey2);
+  var r = await fetch(GROQ, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.key},
+    body:JSON.stringify({model:MODEL, messages:msgs, temperature:temp, max_tokens:maxTok})
+  });
+  if(!r.ok){ var err=await r.json().catch(function(){return{};}); throw new Error(err.error&&err.error.message||'HTTP '+r.status); }
+  return (await r.json()).choices[0].message.content;
+}
+
+function sysPrompt(){
+  var L = getLang();
+  return 'You are the Virtual Nurse AI (\u0627\u0644\u0645\u0645\u0631\u0636 \u0627\u0644\u0627\u0641\u062A\u0631\u0627\u0636\u064A).\n\nLANGUAGE: '+L.syslang+'\n\nKNOWLEDGE BASE (MANDATORY - answer ONLY from these):\n1. NCLEX-RN Test Plan (NCSBN, latest)\n2. Nursing Care Plans - Ackley, Ladwig & Makic\n3. WHO Clinical Nursing Guidelines\n4. Mosby\'s Nursing Drug Reference (current)\n5. Brunner & Suddarth Medical-Surgical Nursing, 14th ed\n6. Potter & Perry Fundamentals of Nursing, 10th ed\n7. Bates\' Guide to Physical Examination, 12th ed\n8. AHA BLS & ACLS 2020/2023\n9. Lowdermilk Maternity & Women\'s Health, 11th ed\n10. Wong\'s Nursing Care of Infants and Children, 11th ed\n\nRULES:\n- ONLY answer from above. If not found, state clearly you cannot find it in your references\n- Never guess or fabricate\n- End every response: [Category] | Ref: [exact source+edition] | Safety: [critical point]';
+}
+
+
+$('ci').oninput = function(){ this.style.height='auto'; this.style.height=Math.min(this.scrollHeight,110)+'px'; };
+
+function addMsg(who, txt){
+  var cm = $('cm');
+  var cw = $('cwelcome'); if(cw) cw.remove();
+  var wrap = document.createElement('div'); wrap.className='msg '+(who==='u'?'u':'b');
+  var av = document.createElement('div'); av.className='av';
+  av.innerHTML = who==='u'
+    ? '<svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="7" r="4"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6"/><\/svg>'
+    : '<svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v8M6 10h8"/><\/svg>';
+  var bbl = document.createElement('div'); bbl.className='bbl';
+  if(who==='b'){ var t=document.createElement('div'); t.className='btag'; t.textContent='NurseAI Pro'; bbl.appendChild(t); bbl.appendChild(document.createTextNode('\n')); }
+  bbl.appendChild(document.createTextNode(txt));
+  wrap.appendChild(av); wrap.appendChild(bbl);
+  cm.appendChild(wrap); cm.scrollTop=cm.scrollHeight;
+}
+
+function showTyp(){
+  var cm=$('cm');
+  var w=document.createElement('div'); w.className='tw'; w.id='typ';
+  var av=document.createElement('div'); av.className='av'; av.style.background='linear-gradient(135deg,var(--em3),var(--em4))';
+  av.innerHTML='<svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v8M6 10h8"/><\/svg>';
+  var dw=document.createElement('div'); dw.className='tdw';
+  for(var i=0;i<3;i++){var d=document.createElement('div');d.className='td';dw.appendChild(d);}
+  w.appendChild(av); w.appendChild(dw); cm.appendChild(w); cm.scrollTop=cm.scrollHeight;
+}
+
+async function doSend(){
+  var inp=$('ci'), txt=inp.value.trim(); if(!txt)return;
+  inp.value=''; inp.style.height='auto';
+  $('sendBtn').disabled=true;
+  addMsg('u',txt);
+  S.hist.push({role:'user',content:txt});
+  showTyp(); S.msgs++;
+  setText('s1',S.msgs);
+  try{
+    var msgs=[{role:'system',content:sysPrompt()}].concat(S.hist.slice(-14));
+    var reply=await callGroq(msgs,0.15,1500);
+    var ty=$('typ'); if(ty)ty.remove();
+    addMsg('b',reply);
+    S.hist.push({role:'assistant',content:reply});
+  }catch(ex){
+    var ty2=$('typ'); if(ty2)ty2.remove();
+    addMsg('b','Error: '+ex.message);
+    setDots('err');
+  }
+  $('sendBtn').disabled=false;
+}
+
+$('sendBtn').onclick = doSend;
+
+function quickAsk(t){ $('ci').value=t; navTo('chat'); doSend(); }
+
+
+async function searchDrug(){
+  var q=get('drugQ'); if(!q){return;}
+  var L=getLang();
+  $('drugBtn').disabled=true;
+  $('drugLoad').classList.add('on');
+  $('drugRes').classList.remove('on');
+  setText('drugLoadT',L.drugLoading);
+  var sys='You are a clinical pharmacist.\n'+L.syslang+'\nFor the drug given, provide complete nursing-focused information.\nFormat with clear sections:\n- Drug Name & Trade Names\n- Drug Class\n- Mechanism of Action\n- Dosage (Adult, Pediatric, Renal/Hepatic adjustment)\n- Routes\n- Pharmacokinetics (Onset/Peak/Duration)\n- Contraindications\n- Drug Interactions\n- Nursing Assessment\n- Nursing Implications\n- Monitoring Parameters\n- Patient Education\n- Antidote (if applicable)\n- Warnings\n- Reference: Mosby\'s Nursing Drug Reference\n\nIf drug exists anywhere in the world, provide complete info.';
+  try{
+    var r=await callGroq([{role:'system',content:sys},{role:'user',content:q}],0.1,1400);
+    $('drugRes').innerHTML='<div class="rh"><div class="rbadge">'+esc(q)+' \u2014 NurseAI</div><\/div><div class="rbody">'+esc(r)+'<\/div>';
+    $('drugRes').classList.add('on');
+  }catch(ex){
+    $('drugRes').innerHTML='<div class="rbody" style="color:var(--red);">'+esc(ex.message)+'<\/div>';
+    $('drugRes').classList.add('on');
+    setDots('err');
+  }
+  $('drugLoad').classList.remove('on');
+  $('drugBtn').disabled=false;
+}
+
+$('drugBtn').onclick=searchDrug;
+$('drugQ').onkeydown=function(e){if(e.key==='Enter')searchDrug();};
+
+
+function swDose(tab,btn){
+  document.querySelectorAll('.dtab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.dpanel').forEach(function(p){p.classList.remove('on');});
+  btn.classList.add('on');
+  $('dp-'+tab).classList.add('on');
+}
+
+async function calcAI(){
+  var drug=get('aiDrug'); if(!drug)return;
+  var L=getLang();
+  $('aiBt').disabled=true;
+  $('aiLoad').classList.add('on');
+  $('aiRes').classList.remove('on');
+  setText('aiLoadT',L.doseLoading);
+  var sys='You are a clinical pharmacist and nursing dose calculation expert.\n'+L.syslang+'\nCalculate precise dose. Show:\n1. Recommended dose from references\n2. Calculated dose for this patient\n3. Calculation steps\n4. Volume to administer\n5. Frequency\n6. Adjustments\n7. Safety limits\n8. Nursing monitoring\n9. Reference';
+  var prompt='Drug: '+drug+'\nWeight: '+(get('aiWt')||'not given')+' kg\nCategory: '+$('aiCat').value+(get('aiMgKg')?'\nRequested dose: '+get('aiMgKg')+' mg/kg':'')+(get('aiNotes')?'\nNotes: '+get('aiNotes'):'');
+  try{
+    var r=await callGroq([{role:'system',content:sys},{role:'user',content:prompt}],0.1,1200);
+    $('aiRes').innerHTML='<div class="rh"><div class="rbadge">Dose Calculation \u2014 NurseAI<\/div><\/div><div class="rbody">'+esc(r)+'<\/div>';
+    $('aiRes').classList.add('on');
+  }catch(ex){
+    $('aiRes').innerHTML='<div class="rbody" style="color:var(--red);">'+esc(ex.message)+'<\/div>';
+    $('aiRes').classList.add('on');
+    setDots('err');
+  }
+  $('aiLoad').classList.remove('on');
+  $('aiBt').disabled=false;
+}
+$('aiBt').onclick=calcAI;
+
+function calcMK(){
+  var dv=$('mkDrug').value, wt=parseFloat($('mkWt').value), dose=parseFloat($('mkDose').value), conc=parseFloat($('mkConc').value);
+  var res=$('mkRes');
+  if(!wt||!dose){res.innerHTML='<div class="dres-v" style="color:var(--red);">'+D['lang_'+S.lang].err_wt_dose+'<\/div>';res.classList.add('on');return;}
+  var total=wt*dose, vol=conc?(total/conc).toFixed(2):null;
+  var maxD=null,range='',freq='',capped=false;
+  if(dv){var p=dv.split(':');range=p[1]+'-'+p[2]+' mg/kg';maxD=parseFloat(p[3]);freq=p[4];if(maxD&&total>maxD){total=maxD;capped=true;if(conc)vol=(total/conc).toFixed(2);}}
+  res.innerHTML='<div class="dres-v">'+total.toFixed(1)+' mg'+(vol?' = '+vol+' ml':'')+'<\/div><div class="dres-s">'+(range?'\u0627\u0644\u0646\u0637\u0627\u0642: '+range+'<br>':'')+(freq?'\u0627\u0644\u062A\u0643\u0631\u0627\u0631: '+freq+'<br>':'')+(capped?'<span style="color:var(--red);">\u062A\u062C\u0627\u0648\u0632 \u0627\u0644\u062D\u062F - \u062A\u0645 \u0627\u0644\u062A\u0635\u062D\u064A\u062D<\/span>':'')+'<\/div><div class="dres-w">\u0631\u0627\u062C\u0639 \u0627\u0644\u0637\u0628\u064A\u0628 \u0642\u0628\u0644 \u0627\u0644\u062A\u0637\u0628\u064A\u0642<\/div>';
+  res.classList.add('on');
+}
+
+function calcIV(){
+  var vol=parseFloat($('ivVol').value), hrs=parseFloat($('ivHrs').value), drop=parseInt($('ivDrop').value);
+  var res=$('ivRes');
+  if(!vol||!hrs){res.innerHTML='<div class="dres-v" style="color:var(--red);">'+D['lang_'+S.lang].err_vol_hrs+'<\/div>';res.classList.add('on');return;}
+  res.innerHTML='<div class="dres-v">'+(vol/hrs).toFixed(1)+' ml/hr &nbsp;|&nbsp; '+((vol*drop)/(hrs*60)).toFixed(0)+' gtt/min<\/div><div class="dres-s">'+vol+'ml / '+hrs+'h | factor: '+drop+'<\/div><div class="dres-w">\u062A\u0623\u0643\u062F \u0645\u0646 \u0648\u0635\u0641\u0629 \u0627\u0644\u0637\u0628\u064A\u0628<\/div>';
+  res.classList.add('on');
+}
+
+
+var TOPICS_AR=D.lang_ar.topics;
+var TOPICS_EN=D.lang_en.topics;
+
+function buildTopicBtns(){
+  var tnames = S.lang==='ar'?TOPICS_AR:TOPICS_EN;
+  document.querySelectorAll('.tb').forEach(function(b){ b.textContent=tnames[b.dataset.t]||b.dataset.t; });
+  var L=getLang();
+  setText('scl',L.score.r); setText('swl',L.score.w); setText('spl',L.score.p);
+  setText('qBtn',L.newQ);
+}
+
+document.querySelectorAll('.tb').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); S.qTopic=b.dataset.t;
+  };
+});
+
+async function newQ(){
+  var L=getLang();
+  if(!S.key){alert(L.noKey);return;}
+  var btn=$('qBtn'); btn.disabled=true; btn.innerHTML='<div class="sp"><\/div>';
+  S.qAns=false;
+  var tnames=S.lang==='ar'?TOPICS_AR:TOPICS_EN;
+  var topic=tnames[S.qTopic];
+  var qs=S.lang==='ar'
+    ?'You are a NCLEX-RN item writer. Generate ONE question in Arabic. Return ONLY valid JSON no markdown:\n{"q":"...","ch":["...","...","...","..."],"c":0,"e":"...with reference"}\nTopic: '+topic+'. Application level or above. All text in Arabic. Cite reference in explanation.'
+    :'You are a NCLEX-RN item writer. Generate ONE question in English. Return ONLY valid JSON no markdown:\n{"q":"...","ch":["...","...","...","..."],"c":0,"e":"...with reference"}\nTopic: '+topic+'. Application level or above. Cite reference in explanation.';
+  try{
+    var r=await callGroq([{role:'user',content:qs}],0.7,600);
+    var q=JSON.parse(r.replace(/```json|```/g,'').trim());
+    S.qN++; setText('s2',S.qN);
+    setText('qNum','Q #'+S.qN);
+    setText('qText',q.q);
+    var ch=$('qChs'); ch.innerHTML='';
+    q.ch.forEach(function(c,i){
+      var b=document.createElement('button'); b.className='qch'; b.textContent=c;
+      b.onclick=function(){ansQ(i,q.c,q.e,ch);};
+      ch.appendChild(b);
+    });
+    $('qExp').className='qexp';
+    $('qbox').classList.add('on');
+    $('srow').style.display='flex';
+    updScore();
+  }catch(ex){alert('Error: '+ex.message);}
+  btn.disabled=false; btn.textContent=getLang().newQ;
+}
+
+$('qBtn').onclick=newQ;
+
+function ansQ(ch,ok,exp,container){
+  if(S.qAns)return; S.qAns=true;
+  container.querySelectorAll('.qch').forEach(function(b,i){b.disabled=true;if(i===ok)b.classList.add('ok');if(i===ch&&ch!==ok)b.classList.add('no');});
+  if(ch===ok)S.qR++;else S.qW++;
+  var e=$('qExp'); e.textContent=exp; e.classList.add('on');
+  updScore();
+}
+function updScore(){
+  setText('scR',S.qR); setText('scW',S.qW);
+  var tot=S.qR+S.qW, pct=tot>0?Math.round((S.qR/tot)*100)+'%':'\u2014';
+  setText('scP',pct); setText('s3',pct);
+}
+
+
+function buildProcCats(){
+  var s=$('procScr'); s.innerHTML='';
+  var L=getLang();
+  var hdr=document.createElement('div'); hdr.className='shr'; hdr.style.marginBottom='2px';
+  hdr.textContent=S.lang==='ar'?D.lang_ar.select_cat:D.lang_en.select_cat;
+  s.appendChild(hdr);
+  var g=document.createElement('div'); g.className='pcg';
+  D.proc_cats.forEach(function(cat){
+    var d=document.createElement('div'); d.className='pcc';
+    d.innerHTML='<div class="pc-ic" style="background:'+cat.col+';"><svg viewBox="0 0 20 20" fill="none" stroke="'+cat.stroke+'" stroke-width="1.6" stroke-linecap="round"><path d="M4 3h12v14H4z"/><path d="M7 8l2 2 4-4M7 13h6"/><\/svg><\/div><div class="pc-info"><h4>'+(S.lang==='ar'?cat.ar:cat.en)+'<\/h4><p>&nbsp;<\/p><span class="pc-cnt">'+cat.procs.length+' '+(S.lang==='ar'?'\u0625\u062C\u0631\u0627\u0621':'proc.')+'<\/span><\/div>';
+    d.onclick=function(){showProcList(cat.id);};
+    g.appendChild(d);
+  });
+  s.appendChild(g);
+}
+
+function showProcList(catId){
+  var cat=D.proc_cats.find(function(c){return c.id===catId;});
+  var L=getLang();
+  var s=$('procScr'); s.innerHTML='';
+  var back=document.createElement('button'); back.className='gbtn'; back.style.marginBottom='10px';
+  back.textContent=L.backCats; back.onclick=buildProcCats; s.appendChild(back);
+  var ttl=document.createElement('div'); ttl.style.cssText='font-size:14px;font-weight:900;color:#fff;margin-bottom:10px;';
+  ttl.textContent=S.lang==='ar'?cat.ar:cat.en; s.appendChild(ttl);
+  if(!cat.procs||!cat.procs.length){
+    var msg=document.createElement('div'); msg.style.cssText='color:var(--tx3);padding:24px;text-align:center;font-size:13px;';
+    msg.textContent=L.procSoon; s.appendChild(msg); return;
+  }
+  var list=document.createElement('div'); list.className='pl';
+  cat.procs.forEach(function(p){
+    var item=document.createElement('div'); item.className='pi';
+    item.innerHTML='<div class="pi-l"><div class="pi-ic" style="background:'+cat.col+';"><svg viewBox="0 0 20 20" fill="none" stroke="'+cat.stroke+'" stroke-width="1.5" stroke-linecap="round"><path d="M4 3h12v14H4z"/><path d="M7 8l2 2 4-4M7 13h6"/><\/svg><\/div><div><h4>'+(S.lang==='ar'?p.ar:p.en)+'<\/h4><\/div><\/div><div class="pi-arr"><svg viewBox="0 0 20 20"><path d="M8 5l-4 7 4 7" stroke="currentColor" stroke-width="1.5"/><\/svg><\/div>';
+    item.onclick=function(){showProcDetail(catId,p.id);};
+    list.appendChild(item);
+  });
+  s.appendChild(list);
+}
+
+function showProcDetail(catId,procId){
+  var cat=D.proc_cats.find(function(c){return c.id===catId;});
+  var proc=cat.procs.find(function(p){return p.id===procId;});
+  if(!proc)return;
+  var L=getLang();
+  var s=$('procScr'); s.innerHTML='';
+  var back=document.createElement('button'); back.className='gbtn'; back.style.marginBottom='10px';
+  back.textContent=L.back; back.onclick=function(){showProcList(catId);}; s.appendChild(back);
+  var ttl=document.createElement('div'); ttl.style.cssText='font-size:14px;font-weight:900;color:#fff;margin-bottom:11px;';
+  ttl.textContent=S.lang==='ar'?proc.ar:proc.en; s.appendChild(ttl);
+  var tabs=document.createElement('div'); tabs.className='ptabs';
+  [['vid',S.lang==='ar'?'\u0641\u064A\u062F\u064A\u0648':'Video'],['text',S.lang==='ar'?'\u0627\u0644\u0634\u0631\u062D \u0627\u0644\u0643\u0627\u0645\u0644':'Full Text'],['quiz',S.lang==='ar'?'\u0627\u0644\u0627\u062E\u062A\u0628\u0627\u0631 (5 \u0623\u0633\u0626\u0644\u0629)':'Quiz (5 Q)']].forEach(function(pair,i){
+    var btn=document.createElement('button'); btn.className='ptab'+(i===0?' on':'');
+    btn.textContent=pair[1];
+    btn.onclick=function(){
+      tabs.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});
+      btn.classList.add('on');
+      document.querySelectorAll('.ptp').forEach(function(p){p.classList.remove('on');});
+      var tp=$('ptp-'+pair[0]); if(tp)tp.classList.add('on');
+    };
+    tabs.appendChild(btn);
+  });
+  s.appendChild(tabs);
+  // VIDEO
+  var vp=document.createElement('div'); vp.className='ptp on'; vp.id='ptp-vid';
+  vp.innerHTML='<div class="vidc"><iframe src="'+proc.vid+'?rel=0&modestbranding=1" title="'+esc(S.lang==='ar'?proc.ar:proc.en)+'" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen><\/iframe><\/div><div class="vn">'+(S.lang==='ar'?proc.ar:proc.en)+'<\/div>';
+  s.appendChild(vp);
+  // TEXT
+  var tp2=document.createElement('div'); tp2.className='ptp'; tp2.id='ptp-text';
+  var tc=document.createElement('div'); tc.className='ptxt';
+  var secs=proc.sec_ar||[];
+  secs.forEach(function(sec){
+    var secEl=document.createElement('div'); secEl.className='psec';
+    var hdr=document.createElement('div'); hdr.className='psh';
+    var ht=document.createElement('div'); ht.className='psh-t'; ht.textContent=sec.h; hdr.appendChild(ht);
+    secEl.appendChild(hdr);
+    var body=document.createElement('div'); body.className='psb';
+    if(sec.steps){
+      var sl=document.createElement('div'); sl.className='psteps';
+      sec.steps.forEach(function(step,i){
+        var st=document.createElement('div'); st.className='pstep';
+        var sn=document.createElement('div'); sn.className='psn'; sn.textContent=i+1;
+        var stxt=document.createElement('div'); stxt.className='pst'; stxt.textContent=step;
+        st.appendChild(sn); st.appendChild(stxt); sl.appendChild(st);
+      });
+      body.appendChild(sl);
+    } else {
+      body.textContent=sec.b;
+    }
+    secEl.appendChild(body); tc.appendChild(secEl);
+  });
+  if(proc.notes_ar&&proc.notes_ar.length){var nb=document.createElement('div');nb.className='pnote';nb.textContent=proc.notes_ar.join('\n');tc.appendChild(nb);}
+  if(proc.danger_ar){var db=document.createElement('div');db.className='pdanger';db.textContent=proc.danger_ar;tc.appendChild(db);}
+  if(proc.ref_ar){var rb=document.createElement('div');rb.className='pref';rb.textContent='Ref: '+proc.ref_ar;tc.appendChild(rb);}
+  tp2.appendChild(tc); s.appendChild(tp2);
+  // QUIZ
+  var qp=document.createElement('div'); qp.className='ptp'; qp.id='ptp-quiz';
+  if(proc.quiz_ar&&proc.quiz_ar.length){
+    var ql=document.createElement('div'); ql.className='pql';
+    proc.quiz_ar.forEach(function(q,qi){
+      var ans=false;
+      var item=document.createElement('div'); item.className='pqi';
+      var qn=document.createElement('div'); qn.className='pqn'; qn.textContent='Q '+(qi+1)+' / '+proc.quiz_ar.length;
+      var qq=document.createElement('div'); qq.className='pqq'; qq.textContent=q.q;
+      var qcs=document.createElement('div'); qcs.className='pqcs';
+      q.ch.forEach(function(c,ci){
+        var btn=document.createElement('button'); btn.className='pqc'; btn.textContent=c;
+        btn.onclick=function(){
+          if(ans)return; ans=true;
+          qcs.querySelectorAll('.pqc').forEach(function(b,i){b.disabled=true;if(i===q.c)b.classList.add('ok');if(i===ci&&ci!==q.c)b.classList.add('no');});
+          var exp=item.querySelector('.pqe'); exp.textContent=q.e; exp.classList.add('on');
+        };
+        qcs.appendChild(btn);
+      });
+      var exp=document.createElement('div'); exp.className='pqe';
+      item.appendChild(qn); item.appendChild(qq); item.appendChild(qcs); item.appendChild(exp);
+      ql.appendChild(item);
+    });
+    qp.appendChild(ql);
+  }
+  s.appendChild(qp);
+}
+
+
+var VR={hr:{l:60,h:100,lo:'Bradycardia',n:'Normal',hi:'Tachycardia'},rr:{l:12,h:20,lo:'Bradypnea',n:'Normal',hi:'Tachypnea'},temp:{l:36.5,h:37.5,lo:'Hypothermia',n:'Normal',hi:'Fever'},spo2:{l:95,h:100,lo:'Hypoxia - Intervene',n:'Normal',hi:'Normal'},gcs:{l:13,h:15,lo:'Altered Consciousness',n:'Normal',hi:'Normal'},bg:{l:70,h:110,lo:'Hypoglycemia',n:'Normal',hi:'Hyperglycemia'}};
+function ckv(id,v){
+  if(id==='bp'){
+    var sys=parseFloat($('vSys').value),dia=parseFloat($('vDia').value);
+    var el=$('vs-bp'); if(!sys&&!dia){el.textContent='';el.className='vs';return;}
+    var txt,cls;
+    if(sys>180||dia>120){txt='Hypertensive Crisis';cls='vc2';}
+    else if(sys>140||dia>90){txt='Hypertension';cls='vw2';}
+    else if(sys<90||dia<60){txt='Hypotension';cls='vw2';}
+    else{txt='Normal';cls='vn2';}
+    el.textContent=txt; el.className='vs '+cls; return;
+  }
+  var val=parseFloat(v), el=$('vs-'+id);
+  if(!val){el.textContent='';el.className='vs';return;}
+  var r=VR[id],txt,cls;
+  if(val<r.l){txt=r.lo;cls=(id==='spo2'||id==='gcs')?'vc2':'vw2';}
+  else if(val>r.h){txt=r.hi;cls='vw2';}
+  else{txt=r.n;cls='vn2';}
+  el.textContent=txt; el.className='vs '+cls;
+}
+
+
+try{var k=localStorage.getItem('naik');if(k){$('apiIn').value=k;S.key=k;setDots('ok');setText('apt',getLang()?getLang().apiStatus.ok:'Connected');}}catch(e){}
+
+})();
+<\/script></script>
+
+</body>
+</html>
