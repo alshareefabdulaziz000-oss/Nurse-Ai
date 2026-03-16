@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>NurseAI Pro</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230ea5e9'/><path d='M16 8v16M8 16h16' stroke='white' stroke-width='3' stroke-linecap='round'/></svg>">
+<!-- fonts loaded locally -->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+/* fonts loaded via link tag */
+:root{
+--bg:#0a0f1a;--bg1:#0d1424;--bg2:#101b2e;--bg3:#162740;
+--sur:#152238;--sur2:#1a2c45;
+--ln:#243a5c;--ln2:#2d4a72;--ln3:#3a5f8f;
+--pri:#3b82f6;--pri2:#2563eb;--pri3:#1d4ed8;--pri4:#1e40af;
+--prig:rgba(59,130,246,.1);
+--grn:#22c55e;--red:#ef4444;--amb:#f59e0b;--pur:#a78bfa;
+--tx:#ffffff;--tx2:#d4e0ec;--tx3:#9fb3c8;
+--r:12px;--rs:8px;
+--ff:system-ui,-apple-system,'Segoe UI',Roboto,'Noto Sans Arabic',sans-serif
+}
+[lang=ar]{--ff:'Noto Sans Arabic',system-ui,-apple-system,sans-serif}
+html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--ff)}
+body{color:var(--tx)}
+
+/* ─ LANG SCREEN ─ */
+#LS{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:20px}
+#LS.gone{display:none}
+.ls-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.ls-bg::before{content:'';position:absolute;top:-120px;left:50%;width:500px;height:500px;transform:translateX(-50%);background:radial-gradient(circle,rgba(59,130,246,.06),transparent 70%)}
+.ls-z{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+.ls-badge{display:inline-flex;align-items:center;gap:6px;background:var(--prig);border:1px solid rgba(59,130,246,.2);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;color:var(--pri);letter-spacing:1.5px;text-transform:uppercase}
+.ls-dot{width:6px;height:6px;border-radius:50%;background:var(--pri);box-shadow:0 0 8px var(--pri)}
+.ls-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--pri3),var(--pri4));border-radius:22px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(59,130,246,.2),0 0 0 1px rgba(59,130,246,.15)}
+.ls-icon svg{width:40px;height:40px}
+.ls-title{font-size:30px;font-weight:900;color:#fff;letter-spacing:-.5px}
+.ls-title span{color:var(--pri)}
+.ls-sub{font-size:12px;color:var(--tx2);line-height:1.7}
+.ls-divider{display:flex;align-items:center;gap:12px;width:300px}
+.ls-divider span{font-size:11px;color:var(--tx3);white-space:nowrap}
+.ls-divider::before,.ls-divider::after{content:'';flex:1;height:1px;background:var(--ln)}
+.ls-cards{display:flex;gap:12px}
+.ls-card{width:140px;padding:18px 14px;cursor:pointer;background:var(--sur);border:2px solid var(--ln2);border-radius:var(--r);display:flex;flex-direction:column;align-items:center;gap:6px;transition:all .2s}
+.ls-card:hover{border-color:var(--pri);box-shadow:0 8px 32px rgba(59,130,246,.1);transform:translateY(-2px)}
+.ls-card .flag{font-size:28px}
+.ls-card .name{font-size:14px;font-weight:800;color:#fff}
+.ls-card .sub{font-size:10px;color:var(--tx3)}
+
+/* ─ APP ─ */
+#APP{display:none;height:100vh}
+#APP.show{display:flex}
+
+/* ─ SIDEBAR ─ */
+.sb{width:56px;flex-shrink:0;background:var(--bg1);border-left:1px solid var(--ln);display:flex;flex-direction:column;align-items:center;padding:10px 0;gap:2px;z-index:100}
+[dir=ltr] .sb{border-left:none;border-right:1px solid var(--ln)}
+.sb-logo{width:36px;height:36px;cursor:pointer;background:linear-gradient(135deg,var(--pri3),var(--pri4));border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(59,130,246,.15)}
+.sb-logo svg{width:18px;height:18px}
+.sb-sep{width:28px;height:1px;background:var(--ln);margin:4px 0}
+.nv{width:40px;height:40px;border:none;border-radius:10px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--tx3);position:relative}
+.nv:hover{background:var(--sur);color:var(--tx)}
+.nv.on{background:var(--prig);color:var(--pri);box-shadow:inset 0 0 0 1px rgba(59,130,246,.2)}
+.nv svg{width:18px;height:18px;fill:currentColor}
+.nv .tip{position:absolute;right:44px;z-index:200;background:var(--sur2);border:1px solid var(--ln2);color:var(--tx);font-family:var(--ff);font-size:10px;font-weight:600;padding:3px 7px;border-radius:5px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+[dir=ltr] .nv .tip{right:auto;left:44px}
+.nv:hover .tip{opacity:1}
+.sb-bot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:2px}
+.api-btn{width:40px;height:40px;border:none;border-radius:10px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--tx3);transition:all .15s;position:relative}
+.api-btn:hover{background:var(--sur);color:var(--pri)}
+.api-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.api-ind{position:absolute;bottom:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--tx3);transition:all .25s}
+.api-ind.ok{background:var(--grn);box-shadow:0 0 5px var(--grn)}
+.api-ind.err{background:var(--red)}
+
+/* ─ API POPUP ─ */
+.api-pop{position:fixed;bottom:50px;right:62px;width:250px;z-index:500;background:var(--sur2);border:1px solid var(--ln3);border-radius:var(--r);padding:14px;box-shadow:0 16px 48px rgba(0,0,0,.5);display:none}
+[dir=ltr] .api-pop{right:auto;left:62px}
+.api-pop.open{display:block}
+.api-pop h4{font-size:11px;font-weight:700;color:var(--pri);margin-bottom:8px}
+.api-pop input{width:100%;background:var(--bg2);border:1px solid var(--ln2);color:var(--tx);padding:7px 9px;border-radius:var(--rs);font-family:monospace;font-size:11px;outline:none;transition:border .15s}
+.api-pop input:focus{border-color:var(--pri)}
+.api-pop-row{display:flex;align-items:center;gap:5px;margin-top:7px}
+.api-pop-dot{width:6px;height:6px;border-radius:50%;background:var(--tx3);transition:all .25s}
+.api-pop-dot.ok{background:var(--grn);box-shadow:0 0 5px var(--grn)}
+.api-pop-dot.err{background:var(--red)}
+.api-pop-txt{font-size:10px;color:var(--tx2)}
+.api-pop p{font-size:9px;color:var(--tx3);margin-top:6px;line-height:1.6}
+
+/* ─ MAIN ─ */
+.main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+.topbar{height:48px;flex-shrink:0;background:rgba(14,23,41,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 14px;gap:8px}
+.tb-info h2{font-size:13px;font-weight:800;color:#fff;line-height:1}
+.tb-info p{font-size:9px;color:var(--tx3);margin-top:2px}
+.tb-right{margin-right:auto;display:flex;align-items:center}
+[dir=ltr] .tb-right{margin-right:0;margin-left:auto}
+.lchip{display:flex;align-items:center;gap:4px;background:var(--sur);border:1px solid var(--ln2);border-radius:16px;padding:3px 9px;font-size:10px;font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s}
+.lchip:hover{border-color:var(--pri);color:var(--pri)}
+
+/* ─ CONTENT ─ */
+.content{flex:1;overflow:hidden;position:relative}
+.vw{display:none;height:100%;flex-direction:column;overflow:hidden}
+.vw.on{display:flex}
+.scr{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.scr::-webkit-scrollbar{width:3px}
+.scr::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:3px}
+
+/* ─ UI COMPONENTS ─ */
+.shr{font-size:9px;font-weight:700;color:var(--pri);letter-spacing:1.2px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.shr::after{content:'';flex:1;height:1px;background:var(--ln)}
+.card{background:var(--sur);border:1px solid var(--ln);border-radius:var(--r);overflow:hidden}
+.ch{padding:12px 14px 0;display:flex;align-items:flex-start;gap:8px}
+.ci{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ci svg{width:16px;height:16px}
+.ct{font-size:13px;font-weight:800;color:#fff}
+.cs{font-size:10px;color:var(--tx3);margin-top:1px}
+.cb{padding:12px 14px}
+.inp{width:100%;background:var(--bg2);border:1px solid var(--ln);color:var(--tx);padding:8px 10px;border-radius:var(--rs);font-size:12px;font-family:var(--ff);outline:none;transition:border .15s}
+.inp:focus{border-color:var(--pri)}
+.inp::placeholder{color:var(--tx3)}
+select.inp option{background:var(--sur)}
+.lbl{font-size:10px;font-weight:600;color:var(--tx2);margin-bottom:4px;display:block}
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.btn{width:100%;padding:9px;background:linear-gradient(135deg,var(--pri2),var(--pri4));border:none;border-radius:var(--rs);color:#fff;font-family:var(--ff);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:5px;box-shadow:0 2px 12px rgba(59,130,246,.1)}
+.btn:hover{box-shadow:0 4px 20px rgba(59,130,246,.2);transform:translateY(-1px)}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.gbtn{display:inline-flex;align-items:center;gap:4px;background:var(--sur);border:1px solid var(--ln2);color:var(--tx2);padding:6px 10px;border-radius:var(--rs);font-family:var(--ff);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.gbtn:hover{border-color:var(--pri);color:var(--pri)}
+.chip{background:var(--sur);border:1px solid var(--ln);color:var(--tx2);padding:4px 9px;border-radius:16px;font-size:10px;font-family:var(--ff);font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap}
+.chipOn{background:var(--prig);border-color:var(--pri);color:var(--pri)}
+.chip:hover{border-color:var(--pri2);color:var(--pri)}
+.sp{width:12px;height:12px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:rot .5s linear infinite}
+.sp-lg{width:24px;height:24px;border:2px solid rgba(59,130,246,.15);border-top-color:var(--pri);border-radius:50%;animation:rot .6s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.loading{display:none;flex-direction:column;align-items:center;gap:8px;padding:24px;text-align:center}
+.loading.on{display:flex}
+.loading p{font-size:11px;color:var(--tx3)}
+.rbox{display:none;background:var(--sur);border:1px solid var(--ln2);border-radius:var(--r);overflow:hidden;animation:fup .2s ease}
+.rbox.on{display:block}
+@keyframes fup{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.rh{padding:8px 12px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:6px;background:rgba(59,130,246,.02)}
+.rbadge{font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--pri);background:var(--prig);border:1px solid rgba(59,130,246,.15);padding:2px 6px;border-radius:3px}
+.rbody{padding:12px;font-size:12px;line-height:1.85;color:var(--tx);white-space:pre-wrap;word-break:break-word}
+
+/* ─ DASHBOARD ─ */
+.hero{background:linear-gradient(135deg,#0c1a30,#112240,#0c1830);border:1px solid var(--ln2);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50px;right:-50px;width:240px;height:240px;background:radial-gradient(circle,rgba(59,130,246,.06),transparent 70%);pointer-events:none}
+[dir=ltr] .hero::before{right:auto;left:-50px}
+.hero-lbl{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--pri);margin-bottom:6px}
+.hero-ttl{font-size:20px;font-weight:900;color:#fff;line-height:1.15;letter-spacing:-.3px;margin-bottom:4px}
+.hero-desc{font-size:11px;color:var(--tx2);line-height:1.7}
+.hero-refs{display:flex;flex-wrap:wrap;gap:4px;margin-top:10px}
+.rpill{font-size:8px;font-weight:700;color:rgba(59,130,246,.75);background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.1);padding:2px 5px;border-radius:3px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.sc{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);padding:10px;text-align:center}
+.sv{font-size:20px;font-weight:800;font-family:'Plus Jakarta Sans',monospace;color:var(--pri)}
+.sl{font-size:9px;color:var(--tx3);margin-top:1px;font-weight:600}
+.qag{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.qa{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);padding:10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+.qa:hover{border-color:var(--pri2);transform:translateY(-1px)}
+.qa-ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.qa-ic svg{width:14px;height:14px}
+.qa h4{font-size:11px;font-weight:700;color:#fff}
+.qa p{font-size:9px;color:var(--tx3)}
+.dash-chips{display:flex;gap:5px;flex-wrap:wrap}
+
+/* ─ CHAT ─ */
+.cw{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.cm{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.cm::-webkit-scrollbar{width:3px}
+.cm::-webkit-scrollbar-thumb{background:var(--ln2);border-radius:3px}
+.cwelcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center}
+.cw-ic{width:56px;height:56px;background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.12);border-radius:16px;display:flex;align-items:center;justify-content:center}
+.cw-ic svg{width:26px;height:26px;fill:none;stroke:var(--pri);stroke-width:1.5}
+.cw-t{font-size:15px;font-weight:900;color:#fff}
+.cw-s{font-size:11px;color:var(--tx2);line-height:1.7;max-width:260px}
+.msg{display:flex;gap:8px;max-width:88%;animation:fup .15s ease}
+.msg.u{flex-direction:row-reverse;align-self:flex-end}
+.msg.b{align-self:flex-start}
+.av{width:28px;height:28px;border-radius:8px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center}
+.msg.u .av{background:var(--pri3)}
+.msg.b .av{background:linear-gradient(135deg,var(--pri3),var(--pri4));box-shadow:0 0 10px rgba(59,130,246,.12)}
+.av svg{width:13px;height:13px;fill:currentColor}
+.bbl{padding:8px 11px;border-radius:10px;font-size:12px;line-height:1.8;white-space:pre-wrap;word-break:break-word}
+.msg.u .bbl{background:linear-gradient(135deg,var(--pri3),var(--pri4));color:#fff;border-radius:10px 2px 10px 10px}
+[dir=ltr] .msg.u .bbl{border-radius:2px 10px 10px 10px}
+.msg.b .bbl{background:var(--sur);border:1px solid var(--ln);border-radius:2px 10px 10px 10px;color:var(--tx)}
+[dir=ltr] .msg.b .bbl{border-radius:10px 2px 10px 10px}
+.btag{font-size:8px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--pri);background:var(--prig);border:1px solid rgba(59,130,246,.15);padding:1px 5px;border-radius:3px;margin-bottom:4px;display:inline-block}
+.tw{display:flex;gap:8px;align-self:flex-start}
+.tdw{background:var(--sur);border:1px solid var(--ln);border-radius:2px 10px 10px 10px;padding:10px 12px;display:flex;gap:3px;align-items:center}
+.td{width:4px;height:4px;border-radius:50%;background:var(--pri);animation:tdot 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes tdot{0%,60%,100%{transform:translateY(0);opacity:.3}30%{transform:translateY(-4px);opacity:1}}
+.ccr{display:flex;gap:4px;padding:6px 12px;overflow-x:auto;flex-shrink:0}
+.ccr::-webkit-scrollbar{display:none}
+.cia{display:flex;gap:6px;align-items:flex-end;padding:8px 12px;background:rgba(14,23,41,.97);border-top:1px solid var(--ln);flex-shrink:0}
+.cta{flex:1;background:var(--sur);border:1px solid var(--ln);color:var(--tx);padding:8px 10px;border-radius:10px;font-size:12px;font-family:var(--ff);resize:none;outline:none;max-height:100px;line-height:1.6;transition:border .15s}
+.cta:focus{border-color:var(--pri)}
+.cta::placeholder{color:var(--tx3)}
+.send{width:36px;height:36px;flex-shrink:0;background:linear-gradient(135deg,var(--pri2),var(--pri4));border:none;border-radius:9px;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;box-shadow:0 2px 10px rgba(59,130,246,.12)}
+.send:hover{transform:scale(1.04)}
+.send:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.send svg{width:15px;height:15px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round}
+
+/* ─ DOSE TABS ─ */
+.dtabs{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
+.dtab{flex:1;min-width:60px;padding:6px 4px;background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);font-family:var(--ff);font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;text-align:center;transition:all .15s}
+.dtab.on{background:var(--prig);border-color:var(--pri);color:var(--pri)}
+.dpanel{display:none}
+.dpanel.on{display:block}
+.dres{margin-top:8px;display:none;background:rgba(59,130,246,.03);border:1px solid rgba(59,130,246,.12);border-radius:var(--rs);padding:10px}
+.dres.on{display:block}
+.dres-v{font-size:18px;font-weight:800;color:var(--pri);font-family:'Plus Jakarta Sans',monospace;margin-bottom:4px}
+.dres-s{font-size:10px;color:var(--tx3);line-height:1.75}
+.dres-w{font-size:10px;color:#fde047;margin-top:6px;padding-top:6px;border-top:1px solid #422006;font-weight:600}
+
+/* ─ QUIZ ─ */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:8px}
+.tb{background:var(--bg2);border:1px solid var(--ln);color:var(--tx2);padding:7px 4px;border-radius:var(--rs);font-family:var(--ff);font-size:10px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.tb.on{border-color:var(--pri);color:var(--pri);background:var(--prig)}
+.qbox{background:var(--sur);border:1px solid var(--ln);border-radius:var(--r);padding:14px;display:none}
+.qbox.on{display:block}
+.qnum{font-family:'Plus Jakarta Sans',monospace;font-size:9px;color:var(--pri);margin-bottom:5px;font-weight:700}
+.qtext{font-size:13px;font-weight:600;line-height:1.8;margin-bottom:10px;color:#fff}
+.qchs{display:flex;flex-direction:column;gap:5px}
+.qch{background:var(--bg2);border:1px solid var(--ln);border-radius:var(--rs);padding:8px 10px;font-family:var(--ff);font-size:11px;color:var(--tx);text-align:right;cursor:pointer;transition:all .15s}
+[dir=ltr] .qch{text-align:left}
+.qch:hover:not([disabled]){border-color:var(--ln2);background:var(--sur)}
+.qch.ok{border-color:var(--grn);background:rgba(34,197,94,.06);color:#86efac}
+.qch.no{border-color:var(--red);background:rgba(239,68,68,.06);color:#fca5a5}
+.qexp{display:none;margin-top:8px;background:#0c2d48;border:1px solid #1e5a8a;border-radius:var(--rs);padding:10px;font-size:11px;line-height:1.8;color:#7dd3fc}
+.qexp.on{display:block}
+.srow{display:flex;gap:5px}
+.sbdg{background:var(--sur);border:1px solid var(--ln);border-radius:5px;padding:4px 9px;font-family:'Plus Jakarta Sans',monospace;font-size:10px;color:var(--tx2)}
+.sbdg b{color:var(--pri)}
+
+/* ─ PROCEDURES ─ */
+.pcg{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pcc{background:var(--sur);border:1px solid var(--ln);border-radius:var(--r);padding:12px;cursor:pointer;transition:all .15s;display:flex;align-items:flex-start;gap:9px}
+.pcc:hover{border-color:var(--pri2);transform:translateY(-1px)}
+.pc-ic{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pc-ic svg{width:17px;height:17px;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.pc-info h4{font-size:11px;font-weight:700;color:#fff}
+.pc-info p{font-size:9px;color:var(--tx3)}
+.pc-cnt{font-size:8px;font-weight:700;color:var(--pri);background:var(--prig);border:1px solid rgba(59,130,246,.12);padding:1px 4px;border-radius:3px;margin-top:3px;display:inline-block}
+.pl{display:flex;flex-direction:column;gap:5px}
+.pi{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);padding:10px 12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:space-between}
+.pi:hover{border-color:var(--pri2)}
+.pi-l{display:flex;align-items:center;gap:7px}
+.pi-ic{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pi-ic svg{width:13px;height:13px;fill:none;stroke-width:1.5;stroke-linecap:round}
+.pi h4{font-size:11px;font-weight:700;color:#fff}
+.pi-arr svg{width:12px;height:12px;fill:none;stroke:var(--tx3);stroke-width:2}
+.ptabs{display:flex;gap:4px;margin-bottom:10px}
+.ptab{flex:1;padding:7px;background:var(--bg2);border:1px solid var(--ln);border-radius:var(--rs);font-family:var(--ff);font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;text-align:center;transition:all .15s}
+.ptab.on{background:var(--prig);border-color:var(--pri);color:var(--pri)}
+.ptp{display:none}
+.ptp.on{display:block}
+.vidc{width:100%;aspect-ratio:16/9;background:#000;border-radius:var(--r);border:1px solid var(--ln);overflow:hidden;position:relative}
+.vidc iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+.vid-link{display:block;margin-top:6px;text-align:center;font-size:10px;color:var(--pri);text-decoration:none;opacity:.7}
+.vid-link:hover{opacity:1}
+.ptxt{display:flex;flex-direction:column;gap:8px}
+.psec{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);overflow:hidden}
+.psh{padding:8px 10px;border-bottom:1px solid var(--ln);background:rgba(59,130,246,.02)}
+.psh-t{font-size:10px;font-weight:800;color:#60a5fa;letter-spacing:.5px;text-transform:uppercase}
+.psb{padding:9px 10px;font-size:11px;color:var(--tx);line-height:1.8;white-space:pre-wrap}
+.psteps{display:flex;flex-direction:column;gap:5px}
+.pstep{display:flex;gap:7px;align-items:flex-start}
+.psn{min-width:20px;height:20px;background:linear-gradient(135deg,var(--pri3),var(--pri4));border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0;margin-top:1px}
+.pst{font-size:11px;color:var(--tx);line-height:1.7}
+.pnote{padding:10px 12px;background:#422006;border:1px solid #92400e;border-radius:var(--rs);font-size:12px;color:#fde047;line-height:1.8;font-weight:600}
+.pdanger{padding:10px 12px;background:#450a0a;border:1px solid #991b1b;border-radius:var(--rs);font-size:12px;color:#fca5a5;line-height:1.8;font-weight:600}
+.pref{padding:8px 12px;background:#172554;border:1px solid #1e40af;border-radius:var(--rs);font-size:11px;color:#93c5fd;font-weight:600}
+.pql{display:flex;flex-direction:column;gap:7px}
+.pqi{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);padding:10px}
+.pqn{font-family:'Plus Jakarta Sans',monospace;font-size:8px;color:var(--pri);margin-bottom:4px;font-weight:700}
+.pqq{font-size:11px;font-weight:600;line-height:1.75;margin-bottom:7px;color:#fff}
+.pqcs{display:flex;flex-direction:column;gap:4px}
+.pqc{background:var(--bg2);border:1px solid var(--ln);border-radius:var(--rs);padding:7px 9px;font-family:var(--ff);font-size:10px;color:var(--tx);text-align:right;cursor:pointer;transition:all .15s}
+[dir=ltr] .pqc{text-align:left}
+.pqc:hover:not([disabled]){border-color:var(--ln2)}
+.pqc.ok{border-color:var(--grn);background:rgba(34,197,94,.05);color:#86efac}
+.pqc.no{border-color:var(--red);background:rgba(239,68,68,.05);color:#fca5a5}
+.pqe{display:none;margin-top:6px;background:#0c2d48;border:1px solid #1e5a8a;border-radius:var(--rs);padding:8px;font-size:10px;line-height:1.8;color:#7dd3fc}
+.pqe.on{display:block}
+
+/* ─ VITALS ─ */
+.vg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.vc{background:var(--sur);border:1px solid var(--ln);border-radius:var(--rs);padding:10px;display:flex;flex-direction:column;gap:5px}
+.vc label{font-size:10px;font-weight:600;color:var(--tx2)}
+.vi{background:var(--bg2);border:1px solid var(--ln);color:var(--tx);padding:6px 8px;border-radius:var(--rs);font-family:'Plus Jakarta Sans',monospace;font-size:14px;font-weight:700;outline:none;width:100%;transition:border .15s}
+.vi:focus{border-color:var(--pri)}
+.vs{font-size:9px;padding:2px 5px;border-radius:3px;width:fit-content;font-weight:700}
+.vn2{background:rgba(34,197,94,.06);color:var(--grn);border:1px solid rgba(34,197,94,.15)}
+.vw2{background:rgba(245,158,11,.06);color:var(--amb);border:1px solid rgba(245,158,11,.15)}
+.vc2{background:rgba(239,68,68,.06);color:var(--red);border:1px solid rgba(239,68,68,.15)}
+
+</style>
+</head>
+<body>
+
+<script id="D" type="application/json">
+
+
+/*__DATA_PLACEHOLDER__*/
+
+
+</script>
+
+<!-- LANGUAGE SCREEN -->
+<div id="LS">
+<div class="ls-bg"></div>
+<div class="ls-z">
+<div class="ls-badge"><div class="ls-dot"></div>Clinical Nursing AI</div>
+<div class="ls-icon"><svg viewBox="0 0 40 40" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round"><circle cx="20" cy="20" r="16" stroke="rgba(59,130,246,.35)" fill="rgba(59,130,246,.06)"/><path d="M20 10v20M10 20h20"/><circle cx="20" cy="20" r="5" stroke="rgba(59,130,246,.5)" fill="rgba(59,130,246,.08)"/></svg></div>
+<div class="ls-title">NurseAI <span>Pro</span></div>
+<div class="ls-sub">Evidence-Based Nursing Assistant</div>
+<div class="ls-divider"><span>Select Language</span></div>
+<div class="ls-cards">
+<div class="ls-card" id="btn-ar"><div class="flag">🇸🇦</div><div class="name">عربي</div><div class="sub">Arabic</div></div>
+<div class="ls-card" id="btn-en"><div class="flag">🇬🇧</div><div class="name">English</div><div class="sub">English</div></div>
+</div>
+</div>
+</div>
+
+<!-- APP -->
+<div id="APP">
+<div class="sb">
+<div class="sb-logo" id="brandBtn"><svg viewBox="0 0 18 18" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.5" stroke-linecap="round"><path d="M9 4v10M4 9h10"/></svg></div>
+<div class="sb-sep"></div>
+<button class="nv on" id="nv-dash"><svg viewBox="0 0 20 20" fill="currentColor"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg><span class="tip" id="tip-dash"></span></button>
+<button class="nv" id="nv-chat"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 4a2 2 0 012-2h12a2 2 0 012 2v8a2 2 0 01-2 2H7l-4 3v-3a2 2 0 01-1-1.7V4z"/></svg><span class="tip" id="tip-chat"></span></button>
+<button class="nv" id="nv-drugs"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.5 3.5a4.5 4.5 0 00-6.36 6.36l6.36 6.36a4.5 4.5 0 006.36-6.36l-6.36-6.36zM7.17 6.17l3.54 3.54-3.54 3.54a2.5 2.5 0 010-3.54l0 0a2.5 2.5 0 010-3.54z"/></svg><span class="tip" id="tip-drugs"></span></button>
+<button class="nv" id="nv-dose"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 3h6v2H7V5zm0 4h2v2H7V9zm0 4h2v2H7v-2zm4-4h2v2h-2V9zm0 4h2v2h-2v-2z"/></svg><span class="tip" id="tip-dose"></span></button>
+<button class="nv" id="nv-quiz"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M8 2a1 1 0 00-1 1v1H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2h-2V3a1 1 0 00-1-1H8zm0 2h4v1H8V4zm1 5l1.5 1.5L14 7l1 1-4.5 4.5L8 10l1-1z"/></svg><span class="tip" id="tip-quiz"></span></button>
+<button class="nv" id="nv-proc"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm6 0v4h4L10 4zm-2 7a.5.5 0 000 1h4a.5.5 0 000-1H8zm0 2a.5.5 0 000 1h4a.5.5 0 000-1H8z"/></svg><span class="tip" id="tip-proc"></span></button>
+<div class="sb-bot">
+<button class="nv" id="nv-vitals"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,10 5,10 7,4 10,16 13,7 15,10 18,10"/></svg><span class="tip" id="tip-vitals"></span></button>
+<div class="sb-sep"></div>
+<button class="api-btn" id="apiBtn"><svg viewBox="0 0 20 20"><rect x="5" y="9" width="10" height="8" rx="2"/><path d="M7 9V6a3 3 0 016 0v3"/></svg><div class="api-ind" id="apiInd"></div><span class="tip">API Key</span></button>
+</div>
+</div>
+<div class="api-pop" id="apiPop"><h4>Groq API Key</h4><input type="password" id="apiIn" placeholder="gsk_..."><div class="api-pop-row"><div class="api-pop-dot" id="apd"></div><span class="api-pop-txt" id="apt"></span></div><p>console.groq.com</p></div>
+<div class="main">
+<div class="topbar"><div class="tb-info"><h2 id="pgT"></h2><p id="pgS"></p></div><div class="tb-right"><div class="lchip" id="langChip"><span id="lfl"></span><span id="lnm"></span></div></div></div>
+<div class="content">
+<!-- DASHBOARD -->
+<div class="vw on" id="vw-dash"><div class="scr">
+<div class="hero"><div class="hero-lbl" id="heroLbl"></div><div class="hero-ttl" id="heroTtl"></div><div class="hero-desc" id="heroDesc"></div></div>
+<div class="stats"><div class="sc"><div class="sv" id="s1">0</div><div class="sl" id="slMsg"></div></div><div class="sc"><div class="sv" id="s2">0</div><div class="sl" id="slQ"></div></div><div class="sc"><div class="sv" id="s3">—</div><div class="sl" id="slSc"></div></div></div>
+<div class="shr" id="qaH"></div>
+<div class="qag">
+<div class="qa" id="qa1"><div class="qa-ic" style="background:rgba(59,130,246,.08)"><svg viewBox="0 0 20 20" fill="var(--pri)"><path d="M17 3H3a1 1 0 00-1 1v9a1 1 0 001 1h2v3l4-3h8a1 1 0 001-1V4a1 1 0 00-1-1z"/></svg></div><div><h4 id="qa1t"></h4><p id="qa1s"></p></div></div>
+<div class="qa" id="qa2"><div class="qa-ic" style="background:rgba(34,197,94,.08)"><svg viewBox="0 0 20 20" fill="var(--grn)"><path d="M10 2a3 3 0 013 3v.5h1a2 2 0 012 2V15a2 2 0 01-2 2H6a2 2 0 01-2-2V7.5a2 2 0 012-2h1V5a3 3 0 013-3z"/></svg></div><div><h4 id="qa2t"></h4><p id="qa2s"></p></div></div>
+<div class="qa" id="qa3"><div class="qa-ic" style="background:rgba(167,139,250,.08)"><svg viewBox="0 0 20 20" fill="var(--pur)"><path d="M4 3h12v14H4z"/></svg></div><div><h4 id="qa3t"></h4><p id="qa3s"></p></div></div>
+<div class="qa" id="qa4"><div class="qa-ic" style="background:rgba(245,158,11,.08)"><svg viewBox="0 0 20 20" fill="var(--amb)"><path d="M5 2h10l1 4H4L5 2zm-1 5h12l-1 11H6L4 7z"/></svg></div><div><h4 id="qa4t"></h4><p id="qa4s"></p></div></div>
+</div>
+<div class="shr" id="cqH"></div>
+<div class="dash-chips" id="dChips"></div>
+</div></div>
+<!-- CHAT -->
+<div class="vw" id="vw-chat"><div class="cw"><div class="cm" id="cm"><div class="cwelcome" id="cwelcome"><div class="cw-ic"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="12"/><path d="M15 9v12M9 15h12" stroke-linecap="round"/></svg></div><div class="cw-t" id="cwT"></div><div class="cw-s" id="cwS"></div></div></div><div class="ccr" id="ccr"></div><div class="cia"><button class="send" id="sendBtn"><svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5"/></svg></button><textarea class="cta" id="ci" rows="1"></textarea></div></div></div>
+<!-- DRUGS -->
+<div class="vw" id="vw-drugs"><div class="scr"><div class="card"><div class="cb"><input type="text" class="inp" id="drugQ" style="direction:auto"><div style="height:6px"></div><button class="btn" id="drugBtn"></button></div></div><div class="loading" id="drugLoad"><div class="sp-lg"></div><p id="drugLoadT"></p></div><div class="rbox" id="drugRes"></div></div></div>
+<!-- DOSE -->
+<div class="vw" id="vw-dose"><div class="scr">
+<div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px" id="calcGrid"></div>
+<div id="calcArea"></div>
+</div></div>
+<!-- QUIZ -->
+<div class="vw" id="vw-quiz"><div class="scr"><div class="card"><div class="cb"><div class="tgrid" id="tgrid"></div><button class="btn" id="qBtn"></button></div></div><div class="srow" id="srow" style="display:none"><div class="sbdg"><span id="scl"></span>: <b id="scR">0</b></div><div class="sbdg"><span id="swl"></span>: <b id="scW">0</b></div><div class="sbdg"><span id="spl"></span>: <b id="scP">—</b></div></div><div class="qbox" id="qbox"><div class="qnum" id="qNum"></div><div class="qtext" id="qText"></div><div class="qchs" id="qChs"></div><div class="qexp" id="qExp"></div></div></div></div>
+<!-- PROCEDURES -->
+<div class="vw" id="vw-proc"><div class="scr" id="procScr"></div></div>
+<!-- VITALS -->
+<div class="vw" id="vw-vitals"><div class="scr">
+<div class="shr" id="vitHdr"></div>
+<div class="vg">
+<div class="vc"><label>HR (bpm)</label><input type="number" class="vi" id="vHR" placeholder="72" oninput="ckv('hr',this.value)"><div class="vs" id="vs-hr"></div></div>
+<div class="vc"><label>RR (/min)</label><input type="number" class="vi" id="vRR" placeholder="16" oninput="ckv('rr',this.value)"><div class="vs" id="vs-rr"></div></div>
+<div class="vc"><label>Temp (°C)</label><input type="number" class="vi" id="vT" placeholder="37.0" step="0.1" oninput="ckv('temp',this.value)"><div class="vs" id="vs-temp"></div></div>
+<div class="vc"><label>SpO2 (%)</label><input type="number" class="vi" id="vSp" placeholder="98" oninput="ckv('spo2',this.value)"><div class="vs" id="vs-spo2"></div></div>
+<div class="vc" style="grid-column:span 2"><label>BP (mmHg)</label><div style="display:flex;gap:6px;align-items:center"><input type="number" class="vi" id="vSys" placeholder="120" style="flex:1" oninput="ckv('bp')"><span style="color:var(--tx3);font-weight:700">/</span><input type="number" class="vi" id="vDia" placeholder="80" style="flex:1" oninput="ckv('bp')"></div><div class="vs" id="vs-bp"></div></div>
+<div class="vc"><label>GCS</label><input type="number" class="vi" id="vGCS" placeholder="15" min="3" max="15" oninput="ckv('gcs',this.value)"><div class="vs" id="vs-gcs"></div></div>
+<div class="vc"><label>Glucose (mg/dL)</label><input type="number" class="vi" id="vBG" placeholder="100" oninput="ckv('bg',this.value)"><div class="vs" id="vs-bg"></div></div>
+</div>
+<div class="card"><div class="cb"><div class="shr" id="normHdr" style="margin-bottom:7px"></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:11px;line-height:2;color:var(--tx2)"><div>HR: <b style="color:var(--tx)">60-100</b></div><div>RR: <b style="color:var(--tx)">12-20</b></div><div>Temp: <b style="color:var(--tx)">36.5-37.5</b></div><div>SpO2: <b style="color:var(--tx)">95%+</b></div><div>SBP: <b style="color:var(--tx)">90-140</b></div><div>DBP: <b style="color:var(--tx)">60-90</b></div><div>GCS: <b style="color:var(--tx)">13-15</b></div><div>Glucose: <b style="color:var(--tx)">70-110</b></div></div></div></div>
+</div></div>
+</div>
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+try{
+var D=JSON.parse(document.getElementById('D').textContent);
+var S={key:'',lang:'ar',apiOpen:false,hist:[],msgs:0,qN:0,qR:0,qW:0,qAns:false,qTopic:'general'};
+var GROQ='https://api.groq.com/openai/v1/chat/completions',MODEL='llama-3.1-70b-versatile';
+var DRUGS=/*__DRUGS_PLACEHOLDER__*/[];
+function esc(t){return t?String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):'';}
+function $(id){return document.getElementById(id);}
+function tx(id,t){var e=$(id);if(e)e.textContent=t;}
+function gt(id){var e=$(id);return e?e.value.trim():'';}
+function L(){return D[S.lang];}
+function t(o){return typeof o==='object'?(o[S.lang==='ar'?'ar':'en']||o.ar||o.en||''):o;}
+
+// ═══ LAUNCH ═══
+function launch(lang){
+  S.lang=lang;
+  $('LS').classList.add('gone');
+  $('APP').classList.add('show');
+  document.documentElement.dir=lang==='ar'?'rtl':'ltr';
+  document.documentElement.lang=lang;
+  applyLang();buildProcCats();buildTopicBtns();buildDrugSelect();buildCalcs();
+}
+$('btn-ar').onclick=function(){launch('ar');};
+$('btn-en').onclick=function(){launch('en');};
+
+// ═══ APPLY LANGUAGE ═══
+function applyLang(){
+  var l=L();
+  $('lfl').textContent=l.flag;$('lnm').textContent=l.fname;
+  $('ci').placeholder=l.chatPH;$('ci').style.direction=S.lang==='ar'?'rtl':'ltr';
+  tx('cwT',l.cwt);tx('cwS',l.cws);
+  tx('heroLbl',l.hero.lbl);tx('heroTtl',l.hero.ttl);tx('heroDesc',l.hero.desc);
+  tx('slMsg',l.sl.msg);tx('slQ',l.sl.q);tx('slSc',l.sl.sc);
+  tx('qaH',l.quickAccess);tx('cqH',l.commonQ);
+  tx('qa1t',l.qa.q1);tx('qa1s',l.qa.q1s);tx('qa2t',l.qa.q2);tx('qa2s',l.qa.q2s);
+  tx('qa3t',l.qa.q3);tx('qa3s',l.qa.q3s);tx('qa4t',l.qa.q4);tx('qa4s',l.qa.q4s);
+  tx('vitHdr',l.vitalsHdr);tx('normHdr',l.normalRanges);
+  // Sidebar tips
+  var tips=l.tips||{};
+  Object.keys(tips).forEach(function(k){tx('tip-'+k,tips[k]);});
+  // Page title
+  var m=l.pages.dash;if(m){tx('pgT',m[0]);tx('pgS',m[1]);}
+  tx('apt',l.apiEmpty);
+  // Drug page
+  $('drugQ').placeholder=l.drugPH;tx('drugBtn',l.drugSearch);
+  // Dose page
+  
+  
+  
+  
+  
+  
+  // Category select
+  var cs=$('aiCat');cs.innerHTML='';
+  var cats=l.cats||{};
+  Object.keys(cats).forEach(function(k){var o=document.createElement('option');o.value=k;o.textContent=cats[k];cs.appendChild(o);});
+  // Quiz
+  tx('qBtn',l.newQ);tx('scl',l.score.r);tx('swl',l.score.w);tx('spl',l.score.p);
+  // Chat chips
+  var ccr=$('ccr');ccr.innerHTML='';
+  (l.chips||[]).forEach(function(c){var b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=function(){quickAsk(c);};ccr.appendChild(b);});
+  // Dash chips
+  var dc=$('dChips');dc.innerHTML='';
+  (l.chips||[]).forEach(function(c){var b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=function(){quickAsk(c);};dc.appendChild(b);});
+}
+
+// ═══ NAVIGATION ═══
+function navTo(pg){
+  document.querySelectorAll('.vw').forEach(function(v){v.classList.remove('on');});
+  document.querySelectorAll('.nv[id^="nv-"]').forEach(function(b){b.classList.remove('on');});
+  var vw=$('vw-'+pg);if(vw)vw.classList.add('on');
+  var nv=$('nv-'+pg);if(nv)nv.classList.add('on');
+  var m=L().pages[pg];if(m){tx('pgT',m[0]);tx('pgS',m[1]);}
+  if(S.apiOpen)toggleApi();
+}
+['dash','chat','drugs','dose','quiz','proc','vitals'].forEach(function(pg){var b=$('nv-'+pg);if(b)b.onclick=function(){navTo(pg);};});
+$('brandBtn').onclick=function(){navTo('dash');};
+$('qa1').onclick=function(){navTo('chat');};$('qa2').onclick=function(){navTo('drugs');};
+$('qa3').onclick=function(){navTo('proc');};$('qa4').onclick=function(){navTo('dose');};
+$('langChip').onclick=function(){$('LS').classList.remove('gone');$('APP').classList.remove('show');};
+
+// ═══ API KEY ═══
+function toggleApi(){S.apiOpen=!S.apiOpen;$('apiPop').classList.toggle('open',S.apiOpen);}
+$('apiBtn').onclick=function(e){e.stopPropagation();toggleApi();};
+document.addEventListener('click',function(e){if(S.apiOpen&&!e.target.closest('.api-pop')&&!e.target.closest('.api-btn'))toggleApi();});
+$('apiIn').oninput=function(){
+  S.key=this.value.trim();var l=L();
+  if(S.key.startsWith('gsk_')&&S.key.length>20){setDots('ok');tx('apt',l.apiOk);try{localStorage.setItem('naik',S.key);}catch(e){}}
+  else if(S.key.length>3){setDots('err');tx('apt',l.apiErr);}
+  else{setDots('');tx('apt',l.apiEmpty);}
+};
+function setDots(s){['apiInd','apd'].forEach(function(id){var e=$(id);if(!e)return;e.className=id==='apiInd'?'api-ind':'api-pop-dot';if(s==='ok')e.classList.add('ok');else if(s==='err')e.classList.add('err');});}
+
+// ═══ GROQ API ═══
+async function callGroq(msgs,temp,maxTok){
+  if(!S.key)throw new Error(L().noKey2);
+  if(!S.key.startsWith('gsk_'))throw new Error(S.lang==='ar'?'المفتاح يجب أن يبدأ بـ gsk_':'Key must start with gsk_');
+  if(window.location.protocol==='file:')throw new Error(S.lang==='ar'?'الذكاء الاصطناعي يحتاج نشر الموقع على Vercel أولاً — لا يعمل من الملفات المحلية':'AI requires deploying to Vercel first — does not work from local files');
+  try{
+    var r=await fetch(GROQ,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+S.key},body:JSON.stringify({model:MODEL,messages:msgs,temperature:temp||.15,max_tokens:maxTok||1400})});
+    if(!r.ok){var err=await r.json().catch(function(){return{};});var msg=err.error&&err.error.message||'HTTP '+r.status;if(r.status===401)msg=S.lang==='ar'?'مفتاح غير صحيح — تحقق من console.groq.com':'Invalid key — check console.groq.com';if(r.status===429)msg=S.lang==='ar'?'تجاوزت الحد — انتظر دقيقة':'Rate limited — wait a minute';throw new Error(msg);}
+    var data=await r.json();if(!data.choices||!data.choices[0])throw new Error('Empty response');return data.choices[0].message.content;
+  }catch(e){if(e.message==='Failed to fetch'||e.message==='Load failed')throw new Error(S.lang==='ar'?'فشل الاتصال — تحقق من الإنترنت والمفتاح':'Connection failed — check internet & API key');throw e;}
+}
+var MODELS=['llama-3.3-70b-versatile','llama-3.1-70b-versatile','llama3-70b-8192','mixtral-8x7b-32768'];var MI=0;
+function sysPrompt(){var l=L();return'You are NurseAI Pro, a clinical nursing AI.\n\nLANGUAGE: '+l.syslang+'\n\nKNOWLEDGE BASE (answer ONLY from these):\n1. NCLEX-RN Test Plan\n2. WHO Clinical Guidelines\n3. Mosby Drug Reference Drug Reference\n4. Brunner & Suddarth 14th ed\n5. Potter & Perry 10th ed\n6. AHA BLS/ACLS 2020\n7. Lowdermilk Maternity 11th ed\n8. Wong Pediatric Pediatric 11th ed\n9. Bates Physical Examination 12th ed\n\nRULES:\n- Answer ONLY from above references\n- Never fabricate information\n- End with: [Category] | Ref: [source] | Safety: [critical point]';}
+
+// ═══ CHAT ═══
+$('ci').oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px';};
+$('ci').onkeydown=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}};
+function addMsg(who,txt){
+  var cm=$('cm'),cw=$('cwelcome');if(cw)cw.remove();
+  var w=document.createElement('div');w.className='msg '+(who==='u'?'u':'b');
+  var av=document.createElement('div');av.className='av';
+  av.innerHTML=who==='u'?'<svg viewBox="0 0 20 20" fill="currentColor"><circle cx="10" cy="7" r="4"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>':'<svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v8M6 10h8"/></svg>';
+  var bbl=document.createElement('div');bbl.className='bbl';
+  if(who==='b'){var tg=document.createElement('div');tg.className='btag';tg.textContent='NurseAI Pro';bbl.appendChild(tg);}
+  bbl.appendChild(document.createTextNode(txt));
+  w.appendChild(av);w.appendChild(bbl);cm.appendChild(w);cm.scrollTop=cm.scrollHeight;
+}
+function showTyp(){var cm=$('cm'),w=document.createElement('div');w.className='tw';w.id='typ';var av=document.createElement('div');av.className='av';av.style.background='linear-gradient(135deg,var(--pri3),var(--pri4))';av.innerHTML='<svg viewBox="0 0 20 20" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"><circle cx="10" cy="10" r="8"/><path d="M10 6v8M6 10h8"/></svg>';var dw=document.createElement('div');dw.className='tdw';for(var i=0;i<3;i++){var d=document.createElement('div');d.className='td';dw.appendChild(d);}w.appendChild(av);w.appendChild(dw);cm.appendChild(w);cm.scrollTop=cm.scrollHeight;}
+async function doSend(){
+  var inp=$('ci'),txt=inp.value.trim();if(!txt)return;
+  inp.value='';inp.style.height='auto';$('sendBtn').disabled=true;
+  addMsg('u',txt);S.hist.push({role:'user',content:txt});showTyp();S.msgs++;tx('s1',S.msgs);
+  try{var msgs=[{role:'system',content:sysPrompt()}].concat(S.hist.slice(-14));var reply;try{reply=await callGroq(msgs,.15,1500);}catch(ex2){if(MI<MODELS.length-1){MI++;MODEL=MODELS[MI];reply=await callGroq(msgs,.15,1500);}else throw ex2;}var ty=$('typ');if(ty)ty.remove();addMsg('b',reply);S.hist.push({role:'assistant',content:reply});}
+  catch(ex){var ty2=$('typ');if(ty2)ty2.remove();addMsg('b','Error: '+ex.message);setDots('err');}
+  $('sendBtn').disabled=false;
+}
+$('sendBtn').onclick=doSend;
+function quickAsk(t){$('ci').value=t;navTo('chat');doSend();}
+
+// ═══ DRUGS ═══
+async function searchDrug(){
+  var q=gt('drugQ');if(!q)return;var l=L();
+  $('drugBtn').disabled=true;$('drugLoad').classList.add('on');$('drugRes').classList.remove('on');tx('drugLoadT',l.drugLoading);
+  var sys='You are a clinical pharmacist.\n'+l.syslang+'\nProvide complete nursing-focused drug information:\n- Drug Name & Trade Names\n- Drug Class & Mechanism\n- Dosage (Adult, Pediatric, Renal/Hepatic adjustment)\n- Routes & Pharmacokinetics\n- Contraindications & Interactions\n- Nursing Assessment & Monitoring\n- Patient Education\n- Antidote (if applicable)\n- Reference: Mosby Drug Reference Drug Reference';
+  try{var r=await callGroq([{role:'system',content:sys},{role:'user',content:q}],.1,1400);$('drugRes').innerHTML='<div class="rh"><div class="rbadge">'+esc(q)+'</div></div><div class="rbody">'+esc(r)+'</div>';$('drugRes').classList.add('on');}
+  catch(ex){$('drugRes').innerHTML='<div class="rbody" style="color:var(--red)">'+esc(ex.message)+'</div>';$('drugRes').classList.add('on');}
+  $('drugLoad').classList.remove('on');$('drugBtn').disabled=false;
+}
+$('drugBtn').onclick=searchDrug;$('drugQ').onkeydown=function(e){if(e.key==='Enter')searchDrug();};
+
+// ═══ DOSE ═══
+function swDose(tab){
+  document.querySelectorAll('.dtab').forEach(function(t){t.classList.remove('on');});
+  document.querySelectorAll('.dpanel').forEach(function(p){p.classList.remove('on');});
+  var map={AI:'ai',MK:'mgkg',IV:'iv',BMI:'bmi',BSA:'bsa',CrCl:'crcl'};
+  $('dt'+tab).classList.add('on');var dp=$('dp-'+map[tab]);if(dp)dp.classList.add('on');
+}
+$('dtAI').onclick=function(){swDose('AI');};$('dtMK').onclick=function(){swDose('MK');};$('dtIV').onclick=function(){swDose('IV');};
+$('dtBMI').onclick=function(){swDose('BMI');};$('dtBSA').onclick=function(){swDose('BSA');};$('dtCrCl').onclick=function(){swDose('CrCl');};
+function buildDrugSelect(){
+  var sel=$('mkDrug'),l=L();sel.innerHTML='<option value="">'+l.choose+'</option>';
+  var cats={},order=[];
+  DRUGS.forEach(function(d){
+    var c=d.cat||'Other';
+    if(!cats[c]){cats[c]=[];order.push(c);}
+    cats[c].push(d);
+  });
+  order.forEach(function(c){
+    var og=document.createElement('optgroup');og.label=c;
+    cats[c].forEach(function(d){
+      var o=document.createElement('option');o.value=d.n+':'+d.d;
+      var parts=d.d.split(':');
+      o.textContent=d.n+' ('+parts[0]+'-'+parts[1]+' mg/kg)';
+      og.appendChild(o);
+    });
+    sel.appendChild(og);
+  });
+}
+async function calcAI(){
+  var drug=gt('aiDrug');if(!drug)return;var l=L();
+  $('aiBt').disabled=true;$('aiLoad').classList.add('on');$('aiRes').classList.remove('on');tx('aiLoadT',l.doseLoading);
+  var sys='You are a dose calculation expert.\n'+l.syslang+'\nCalculate: recommended dose, patient dose, steps, volume, frequency, adjustments, safety limits, monitoring, reference.';
+  var prompt='Drug: '+drug+'\nWeight: '+(gt('aiWt')||'N/A')+' kg\nCategory: '+$('aiCat').value+(gt('aiMgKg')?'\nDose: '+gt('aiMgKg')+' mg/kg':'')+(gt('aiNotes')?'\nNotes: '+gt('aiNotes'):'');
+  try{var r=await callGroq([{role:'system',content:sys},{role:'user',content:prompt}],.1,1200);$('aiRes').innerHTML='<div class="rh"><div class="rbadge">Dose Calculation</div></div><div class="rbody">'+esc(r)+'</div>';$('aiRes').classList.add('on');}
+  catch(ex){$('aiRes').innerHTML='<div class="rbody" style="color:var(--red)">'+esc(ex.message)+'</div>';$('aiRes').classList.add('on');}
+  $('aiLoad').classList.remove('on');$('aiBt').disabled=false;
+}
+$('aiBt').onclick=calcAI;
+$('mkCalc').onclick=function(){
+  var dv=$('mkDrug').value,wt=parseFloat($('mkWt').value),dose=parseFloat($('mkDose').value),conc=parseFloat($('mkConc').value);
+  var res=$('mkRes'),l=L();
+  if(!wt||!dose){res.innerHTML='<div class="dres-v" style="color:var(--red)">'+l.errWt+'</div>';res.classList.add('on');return;}
+  var total=wt*dose,vol=conc?(total/conc).toFixed(2):null,maxD=null,range='',freq='',capped=false;
+  if(dv){var p=dv.split(':');range=p[1]+'-'+p[2]+' mg/kg';maxD=parseFloat(p[3]);freq=p[4];if(maxD&&total>maxD){total=maxD;capped=true;if(conc)vol=(total/conc).toFixed(2);}}
+  res.innerHTML='<div class="dres-v">'+total.toFixed(1)+' mg'+(vol?' = '+vol+' ml':'')+'</div><div class="dres-s">'+(range?'Range: '+range+'<br>':'')+(freq?'Frequency: '+freq+'<br>':'')+(capped?'<span style="color:var(--red)">'+l.exceeded+'</span>':'')+'</div><div class="dres-w">'+l.checkDr+'</div>';
+  res.classList.add('on');
+};
+$('ivCalc').onclick=function(){
+  var vol=parseFloat($('ivVol').value),hrs=parseFloat($('ivHrs').value),drop=parseInt($('ivDrop').value);
+  var res=$('ivRes'),l=L();
+  if(!vol||!hrs){res.innerHTML='<div class="dres-v" style="color:var(--red)">'+l.errVol+'</div>';res.classList.add('on');return;}
+  res.innerHTML='<div class="dres-v">'+(vol/hrs).toFixed(1)+' ml/hr &nbsp;|&nbsp; '+((vol*drop)/(hrs*60)).toFixed(0)+' gtt/min</div><div class="dres-s">'+vol+'ml / '+hrs+'h | drop factor: '+drop+'</div><div class="dres-w">'+l.checkDr+'</div>';
+  res.classList.add('on');
+};
+
+
+// ═══ BMI ═══
+window.calcBMI=function(){
+  var wt=parseFloat($('bmiWt').value),ht=parseFloat($('bmiHt').value),res=$('bmiRes');
+  if(!wt||!ht){res.innerHTML='<div class="dres-v" style="color:var(--red)">Enter weight and height</div>';res.classList.add('on');return;}
+  var bmi=(wt/((ht/100)*(ht/100))).toFixed(1);
+  var cat,col;
+  if(bmi<18.5){cat='Underweight';col='var(--amb)';}
+  else if(bmi<25){cat='Normal';col='var(--grn)';}
+  else if(bmi<30){cat='Overweight';col='var(--amb)';}
+  else{cat='Obese';col='var(--red)';}
+  res.innerHTML='<div class="dres-v" style="color:'+col+'">BMI: '+bmi+'</div><div class="dres-s">'+cat+'<br>Underweight &lt;18.5 | Normal 18.5-24.9 | Overweight 25-29.9 | Obese &ge;30</div><div class="dres-w">WHO BMI Classification</div>';
+  res.classList.add('on');
+};
+// ═══ BSA (Mosteller) ═══
+window.calcBSA=function(){
+  var wt=parseFloat($('bsaWt').value),ht=parseFloat($('bsaHt').value),res=$('bsaRes');
+  if(!wt||!ht){res.innerHTML='<div class="dres-v" style="color:var(--red)">Enter weight and height</div>';res.classList.add('on');return;}
+  var bsa=Math.sqrt((wt*ht)/3600).toFixed(2);
+  res.innerHTML='<div class="dres-v">BSA: '+bsa+' m\u00b2</div><div class="dres-s">Mosteller Formula: \u221a(weight \u00d7 height / 3600)<br>Average adult: 1.7-2.0 m\u00b2<br>Used for: Chemotherapy dosing, Burns (TBSA), Cardiac Index</div><div class="dres-w">Mosteller RD. N Engl J Med 1987</div>';
+  res.classList.add('on');
+};
+// ═══ CrCl (Cockcroft-Gault) ═══
+window.calcCrCl=function(){
+  var age=parseFloat($('crAge').value),wt=parseFloat($('crWt').value),cr=parseFloat($('crSr').value),gen=$('crGen').value,res=$('crclRes');
+  if(!age||!wt||!cr){res.innerHTML='<div class="dres-v" style="color:var(--red)">Enter all fields</div>';res.classList.add('on');return;}
+  var crcl=((140-age)*wt)/(72*cr);if(gen==='f')crcl*=0.85;crcl=crcl.toFixed(1);
+  var cat,col;
+  if(crcl>=90){cat='Normal kidney function';col='var(--grn)';}
+  else if(crcl>=60){cat='Mild impairment (Stage 2)';col='var(--amb)';}
+  else if(crcl>=30){cat='Moderate impairment (Stage 3)';col='var(--amb)';}
+  else if(crcl>=15){cat='Severe impairment (Stage 4)';col='var(--red)';}
+  else{cat='Kidney failure (Stage 5)';col='var(--red)';}
+  res.innerHTML='<div class="dres-v" style="color:'+col+'">CrCl: '+crcl+' mL/min</div><div class="dres-s">'+cat+'<br>Used for: Dose adjustment of renally-cleared drugs<br>'+
+  (gen==='f'?'Female factor (\u00d70.85) applied':'Male formula used')+'</div><div class="dres-w">Cockcroft-Gault Formula | Verify with physician</div>';
+  res.classList.add('on');
+};
+
+// ═══ 20 MEDICAL CALCULATORS ═══
+var CALCS=[
+{id:'basic',n:{ar:'الجرعة الأساسية (D/H×Q)',en:'Basic Dose (D/H×Q)'},ref:'Potter & Perry 10th ed',
+ fields:[{id:'desired',lbl:{ar:'الجرعة المطلوبة (mg)',en:'Desired (mg)'},t:'n',ph:'500'},{id:'have',lbl:{ar:'المتوفر (mg)',en:'Have (mg)'},t:'n',ph:'250'},{id:'form',lbl:{ar:'الشكل (tablet/ml)',en:'Quantity form'},t:'n',ph:'1'}],
+ fn:function(v){var r=(v.desired/v.have)*v.form;return{v:r.toFixed(2)+' tablets/ml',f:'(D÷H)×Q = ('+v.desired+'÷'+v.have+')×'+v.form+' = '+r.toFixed(2),n:{ar:'D=المطلوب | H=المتوفر | Q=الشكل',en:'D=Desired | H=Have | Q=Quantity'}};}},
+{id:'mgkg',n:{ar:'الجرعة حسب الوزن (mg/kg)',en:'Weight-Based (mg/kg)'},ref:'Mosby Drug Reference',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Weight (kg)'},t:'n',ph:'70'},{id:'dose',lbl:{ar:'mg/kg',en:'mg/kg'},t:'n',ph:'10'},{id:'conc',lbl:{ar:'التركيز mg/ml (اختياري)',en:'Conc mg/ml (optional)'},t:'n',ph:''}],
+ fn:function(v){var t=v.wt*v.dose;var ml=v.conc?(t/v.conc).toFixed(1)+' ml':'';return{v:t.toFixed(1)+' mg'+(ml?' = '+ml:''),f:v.wt+'×'+v.dose+'='+t.toFixed(1)+' mg',n:{ar:'الجرعة = الوزن × mg/kg',en:'Dose = Weight × mg/kg'}};}},
+{id:'peddose',n:{ar:'جرعة الأطفال (Clark)',en:'Pediatric (Clark Rule)'},ref:'Harriet Lane Handbook',
+ fields:[{id:'cwt',lbl:{ar:'وزن الطفل (kg)',en:'Child wt (kg)'},t:'n',ph:'20'},{id:'adose',lbl:{ar:'جرعة البالغ (mg)',en:'Adult dose (mg)'},t:'n',ph:'500'}],
+ fn:function(v){var d=(v.cwt/70)*v.adose;return{v:d.toFixed(1)+' mg',f:'('+v.cwt+'÷70)×'+v.adose+'='+d.toFixed(1),n:{ar:'وزن الطفل÷70×جرعة البالغ. تحقق من الحد الأقصى دائماً',en:'Child wt/70 × adult dose. Always verify max'}};}},
+{id:'bsa',n:{ar:'مساحة سطح الجسم BSA',en:'BSA Dose (Mosteller)'},ref:'N Engl J Med 1987',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Weight (kg)'},t:'n',ph:'70'},{id:'ht',lbl:{ar:'الطول (cm)',en:'Height (cm)'},t:'n',ph:'170'},{id:'dm2',lbl:{ar:'mg/m² (اختياري)',en:'mg/m² (optional)'},t:'n',ph:''}],
+ fn:function(v){var b=Math.sqrt((v.wt*v.ht)/3600);var d=v.dm2?(b*v.dm2).toFixed(1)+' mg':'';return{v:'BSA='+b.toFixed(2)+' m²'+(d?' → '+d:''),f:'√('+v.wt+'×'+v.ht+'÷3600)='+b.toFixed(2),n:{ar:'طبيعي 1.7-2.0 m². للعلاج الكيماوي والحروق',en:'Normal 1.7-2.0 m². For chemo & burns'}};}},
+{id:'ivdrops',n:{ar:'التنقيط الوريدي (gtt/min)',en:'IV Drops (gtt/min)'},ref:'Potter & Perry 10th ed',
+ fields:[{id:'vol',lbl:{ar:'الحجم (ml)',en:'Volume (ml)'},t:'n',ph:'1000'},{id:'hrs',lbl:{ar:'المدة (ساعة)',en:'Hours'},t:'n',ph:'8'},{id:'df',lbl:{ar:'عامل التقطير',en:'Drop Factor'},t:'s',opts:[{v:'20',t:'Macro 20'},{v:'15',t:'Macro 15'},{v:'10',t:'Macro 10'},{v:'60',t:'Micro 60'}]}],
+ fn:function(v){var g=(v.vol*v.df)/(v.hrs*60);return{v:Math.round(g)+' gtt/min',f:'('+v.vol+'×'+v.df+')÷('+v.hrs+'×60)='+g.toFixed(1),n:{ar:'Macro: سوائل عامة | Micro: أدوية دقيقة وأطفال',en:'Macro: general fluids | Micro: precise & peds'}};}},
+{id:'ivpump',n:{ar:'معدل المضخة (mL/hr)',en:'Pump Rate (mL/hr)'},ref:'INS Standards',
+ fields:[{id:'vol',lbl:{ar:'الحجم (ml)',en:'Volume (ml)'},t:'n',ph:'1000'},{id:'hrs',lbl:{ar:'المدة (ساعة)',en:'Hours'},t:'n',ph:'8'}],
+ fn:function(v){var r=v.vol/v.hrs;return{v:r.toFixed(1)+' mL/hr',f:v.vol+'÷'+v.hrs+'='+r.toFixed(1),n:{ar:'الحجم÷الساعات=معدل المضخة',en:'Volume÷Hours=Pump Rate'}};}},
+{id:'micro',n:{ar:'Microdrip (60 gtt/ml)',en:'Microdrip Rate'},ref:'Potter & Perry 10th ed',
+ fields:[{id:'mlhr',lbl:{ar:'mL/hr',en:'mL/hr'},t:'n',ph:'125'}],
+ fn:function(v){return{v:v.mlhr+' gtt/min',f:'Micro 60: gtt/min = mL/hr = '+v.mlhr,n:{ar:'في نظام Micro: النقاط/دقيقة = المليلترات/ساعة دائماً',en:'With Micro 60: gtt/min always equals mL/hr'}};}},
+{id:'macro',n:{ar:'Macrodrip Rate',en:'Macrodrip Rate'},ref:'Potter & Perry 10th ed',
+ fields:[{id:'mlhr',lbl:{ar:'mL/hr',en:'mL/hr'},t:'n',ph:'125'},{id:'df',lbl:{ar:'Drop Factor',en:'Drop Factor'},t:'s',opts:[{v:'20',t:'20 gtt/ml'},{v:'15',t:'15 gtt/ml'},{v:'10',t:'10 gtt/ml'}]}],
+ fn:function(v){var g=(v.mlhr*v.df)/60;return{v:Math.round(g)+' gtt/min',f:'('+v.mlhr+'×'+v.df+')÷60='+g.toFixed(1),n:{ar:'(mL/hr × عامل التقطير) ÷ 60',en:'(mL/hr × Drop Factor) ÷ 60'}};}},
+{id:'cont',n:{ar:'تسريب مستمر (mcg/kg/min)',en:'Continuous (mcg/kg/min)'},ref:'AHA ACLS 2020',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Wt (kg)'},t:'n',ph:'70'},{id:'dose',lbl:{ar:'mcg/kg/min',en:'mcg/kg/min'},t:'n',ph:'5'},{id:'conc',lbl:{ar:'التركيز (mcg/ml)',en:'Conc (mcg/ml)'},t:'n',ph:'1600'}],
+ fn:function(v){var r=(v.wt*v.dose*60)/v.conc;return{v:r.toFixed(1)+' mL/hr',f:'('+v.wt+'×'+v.dose+'×60)÷'+v.conc+'='+r.toFixed(1),n:{ar:'لأدوية: Dopamine, Dobutamine, Epinephrine, Nitroglycerin',en:'For: Dopamine, Dobutamine, Epinephrine, Nitroglycerin'}};}},
+{id:'recon',n:{ar:'إعادة التحضير Reconstitution',en:'Reconstitution'},ref:'Mosby Drug Reference',
+ fields:[{id:'ord',lbl:{ar:'المطلوب (mg)',en:'Ordered (mg)'},t:'n',ph:'500'},{id:'pow',lbl:{ar:'المسحوق (mg)',en:'Powder (mg)'},t:'n',ph:'1000'},{id:'dil',lbl:{ar:'المذيب (ml)',en:'Diluent (ml)'},t:'n',ph:'10'}],
+ fn:function(v){var c=v.pow/v.dil;var ml=v.ord/c;return{v:'تركيز='+c.toFixed(1)+' mg/ml → أعطِ '+ml.toFixed(1)+' ml',f:'Conc='+v.pow+'÷'+v.dil+'='+c.toFixed(1)+' → Vol='+v.ord+'÷'+c.toFixed(1)+'='+ml.toFixed(1),n:{ar:'التركيز = المسحوق÷المذيب | الحجم = الجرعة÷التركيز',en:'Conc = Powder÷Diluent | Vol = Dose÷Conc'}};}},
+{id:'dilute',n:{ar:'التخفيف C1V1=C2V2',en:'Dilution (C1V1=C2V2)'},ref:'Trissel IV Compatibility',
+ fields:[{id:'c1',lbl:{ar:'التركيز الأصلي (mg/ml)',en:'Original Conc'},t:'n',ph:'10'},{id:'v1',lbl:{ar:'الحجم الأصلي (ml)',en:'Original Vol (ml)'},t:'n',ph:'5'},{id:'c2',lbl:{ar:'التركيز المطلوب (mg/ml)',en:'Desired Conc'},t:'n',ph:'2'}],
+ fn:function(v){var v2=(v.c1*v.v1)/v.c2;var add=v2-v.v1;return{v:'الحجم النهائي '+v2.toFixed(1)+' ml (أضف '+add.toFixed(1)+' ml)',f:'C1×V1=C2×V2 → V2=('+v.c1+'×'+v.v1+')÷'+v.c2+'='+v2.toFixed(1),n:{ar:'حجم المذيب المضاف = الحجم النهائي - الأصلي',en:'Diluent = Final Vol - Original Vol'}};}},
+{id:'maxsafe',n:{ar:'الحد الأقصى الآمن',en:'Max Safe Dose'},ref:'ISMP Guidelines',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Wt (kg)'},t:'n',ph:'70'},{id:'mx',lbl:{ar:'الحد (mg/kg)',en:'Max (mg/kg)'},t:'n',ph:'15'},{id:'abs',lbl:{ar:'الحد المطلق (mg)',en:'Absolute Max (mg)'},t:'n',ph:'1000'},{id:'ord',lbl:{ar:'المطلوب (mg)',en:'Ordered (mg)'},t:'n',ph:'900'}],
+ fn:function(v){var m=v.wt*v.mx;if(v.abs&&m>v.abs)m=v.abs;var ok=v.ord<=m;return{v:(ok?'✅ آمنة':'❌ تتجاوز!')+' الحد: '+m.toFixed(0)+' mg',f:'Max='+v.wt+'×'+v.mx+'='+m.toFixed(0)+(v.abs?' (مطلق:'+v.abs+')':'')+' | المطلوب:'+v.ord,n:ok?{ar:'الجرعة ضمن النطاق الآمن',en:'Dose within safe range'}:{ar:'⚠️ تتجاوز الحد! راجع الطبيب',en:'⚠️ Exceeds max! Verify with physician'}};}},
+{id:'minsafe',n:{ar:'الحد الأدنى الفعال',en:'Min Effective Dose'},ref:'Mosby Drug Reference',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Wt (kg)'},t:'n',ph:'70'},{id:'mn',lbl:{ar:'الحد (mg/kg)',en:'Min (mg/kg)'},t:'n',ph:'5'},{id:'ord',lbl:{ar:'المطلوب (mg)',en:'Ordered (mg)'},t:'n',ph:'400'}],
+ fn:function(v){var m=v.wt*v.mn;var ok=v.ord>=m;return{v:(ok?'✅ كافية':'⚠️ أقل من الحد')+' Min: '+m.toFixed(0)+' mg',f:'Min='+v.wt+'×'+v.mn+'='+m.toFixed(0)+' | المطلوب:'+v.ord,n:ok?{ar:'الجرعة فعالة',en:'Dose adequate'}:{ar:'قد لا تكون فعالة. راجع الطبيب',en:'May be subtherapeutic. Verify'}};}},
+{id:'unit',n:{ar:'تحويل الوحدات',en:'Unit Conversion'},ref:'Standard Metric',
+ fields:[{id:'val',lbl:{ar:'القيمة',en:'Value'},t:'n',ph:'500'},{id:'from',lbl:{ar:'من',en:'From'},t:'s',opts:[{v:'g',t:'g'},{v:'mg',t:'mg'},{v:'mcg',t:'mcg'},{v:'L',t:'L'},{v:'ml',t:'mL'}]},{id:'to',lbl:{ar:'إلى',en:'To'},t:'s',opts:[{v:'g',t:'g'},{v:'mg',t:'mg'},{v:'mcg',t:'mcg'},{v:'L',t:'L'},{v:'ml',t:'mL'}]}],
+ fn:function(v){var f={g:1,mg:0.001,mcg:0.000001,L:1,ml:0.001};var wt=['g','mg','mcg'],vol=['L','ml'];if(wt.indexOf(v.from)>=0!==wt.indexOf(v.to)>=0&&vol.indexOf(v.from)<0===vol.indexOf(v.to)<0)return{v:'❌',f:'',n:{ar:'لا يمكن التحويل بين كتلة وحجم',en:'Cannot convert mass to volume'}};var r=v.val*(f[v.from]/f[v.to]);return{v:v.val+' '+v.from+' = '+r+' '+v.to,f:'1g=1000mg=1000000mcg | 1L=1000mL',n:{ar:'1غ=1000ملغ=1000000مكغ | 1لتر=1000مل',en:'1g=1000mg=1000000mcg | 1L=1000mL'}};}},
+{id:'tab',n:{ar:'عدد الأقراص',en:'Tablets/Capsules'},ref:'Potter & Perry 10th ed',
+ fields:[{id:'ord',lbl:{ar:'المطلوب (mg)',en:'Ordered (mg)'},t:'n',ph:'500'},{id:'str',lbl:{ar:'قوة القرص (mg)',en:'Strength (mg)'},t:'n',ph:'250'}],
+ fn:function(v){var n=v.ord/v.str;return{v:n.toFixed(1)+' tablet(s)',f:v.ord+'÷'+v.str+'='+n.toFixed(1),n:n>2?{ar:'⚠️ أكثر من قرصين — تحقق من الأمر',en:'⚠️ More than 2 — double-check order'}:{ar:'عدد مناسب',en:'Appropriate count'}};}},
+{id:'oral',n:{ar:'جرعة الشراب',en:'Oral Liquid Dose'},ref:'Mosby Drug Reference',
+ fields:[{id:'ord',lbl:{ar:'المطلوب (mg)',en:'Ordered (mg)'},t:'n',ph:'250'},{id:'conc',lbl:{ar:'التركيز (mg)',en:'Concentration (mg)'},t:'n',ph:'125'},{id:'per',lbl:{ar:'لكل (ml)',en:'Per (ml)'},t:'n',ph:'5'}],
+ fn:function(v){var ml=(v.ord/v.conc)*v.per;return{v:ml.toFixed(1)+' ml',f:'('+v.ord+'÷'+v.conc+')×'+v.per+'='+ml.toFixed(1),n:{ar:'مثال: 250mg من شراب 125mg/5ml = 10ml',en:'Ex: 250mg from 125mg/5ml = 10ml'}};}},
+{id:'insulin',n:{ar:'جرعة الأنسولين (Correction)',en:'Insulin Correction Dose'},ref:'ADA Standards',
+ fields:[{id:'cbg',lbl:{ar:'السكر الحالي (mg/dL)',en:'Current BG (mg/dL)'},t:'n',ph:'280'},{id:'tgt',lbl:{ar:'المستهدف (mg/dL)',en:'Target (mg/dL)'},t:'n',ph:'120'},{id:'isf',lbl:{ar:'عامل الحساسية ISF',en:'ISF (1 unit lowers by)'},t:'n',ph:'50'}],
+ fn:function(v){var u=Math.max(0,Math.round((v.cbg-v.tgt)/v.isf));return{v:u+' units',f:'('+v.cbg+'-'+v.tgt+')÷'+v.isf+'='+u,n:{ar:'ISF يختلف لكل مريض. تحقق من البروتوكول',en:'ISF varies per patient. Verify protocol'}};}},
+{id:'heparin',n:{ar:'تسريب الهيبارين',en:'Heparin Infusion'},ref:'AHA Anticoag Guidelines',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Wt (kg)'},t:'n',ph:'70'},{id:'dose',lbl:{ar:'units/kg/hr',en:'units/kg/hr'},t:'n',ph:'18'},{id:'conc',lbl:{ar:'التركيز (units/ml)',en:'Conc (units/ml)'},t:'n',ph:'100'}],
+ fn:function(v){var u=v.wt*v.dose;var ml=u/v.conc;return{v:u.toFixed(0)+' units/hr = '+ml.toFixed(1)+' mL/hr',f:v.wt+'×'+v.dose+'='+u.toFixed(0)+'÷'+v.conc+'='+ml.toFixed(1),n:{ar:'راقب aPTT كل 6 ساعات. الهدف 1.5-2.5×. المضاد: Protamine',en:'Monitor aPTT q6h. Goal 1.5-2.5x. Antidote: Protamine'}};}},
+{id:'bolus',n:{ar:'جرعة البلعة الوريدية',en:'IV Bolus Dose'},ref:'AHA ACLS 2020',
+ fields:[{id:'wt',lbl:{ar:'الوزن (kg)',en:'Wt (kg)'},t:'n',ph:'70'},{id:'dose',lbl:{ar:'الجرعة/kg',en:'Dose/kg'},t:'n',ph:'80'},{id:'conc',lbl:{ar:'التركيز',en:'Concentration'},t:'n',ph:'1000'}],
+ fn:function(v){var t=v.wt*v.dose;var ml=t/v.conc;return{v:t.toFixed(0)+' total → '+ml.toFixed(1)+' ml',f:v.wt+'×'+v.dose+'='+t.toFixed(0)+'÷'+v.conc+'='+ml.toFixed(1),n:{ar:'مثال: Heparin 80u/kg لمريض 70kg = 5600 units',en:'Ex: Heparin 80u/kg for 70kg = 5600 units'}};}},
+{id:'tdd',n:{ar:'الجرعة اليومية الكلية',en:'Total Daily Dose'},ref:'Mosby Drug Reference',
+ fields:[{id:'single',lbl:{ar:'الجرعة الواحدة (mg)',en:'Single Dose (mg)'},t:'n',ph:'500'},{id:'freq',lbl:{ar:'التكرار',en:'Frequency'},t:'s',opts:[{v:'1',t:'q24h (1×)'},{v:'2',t:'q12h (2×)'},{v:'3',t:'q8h (3×)'},{v:'4',t:'q6h (4×)'},{v:'6',t:'q4h (6×)'}]}],
+ fn:function(v){var t=v.single*v.freq;return{v:'TDD = '+t+' mg/day',f:v.single+'×'+v.freq+'='+t+' mg/day',n:{ar:'تحقق أن المجموع لا يتجاوز الحد اليومي للدواء',en:'Verify TDD does not exceed daily max'}};}}
+];
+function buildCalcs(){var g=$('calcGrid'),a=$('calcArea');if(!g||!a)return;g.innerHTML='';a.innerHTML='';CALCS.forEach(function(c,i){var b=document.createElement('button');b.className='chip'+(i===0?' chipOn':'');b.textContent=c.n[S.lang]||c.n.en;b.onclick=function(){g.querySelectorAll('.chip').forEach(function(x){x.classList.remove('chipOn');});b.classList.add('chipOn');showCalc(c);};g.appendChild(b);});showCalc(CALCS[0]);}
+function showCalc(c){var a=$('calcArea');var h='<div class="card"><div class="cb"><div style="font-size:13px;font-weight:800;color:#fff;margin-bottom:10px">'+esc(c.n[S.lang]||c.n.en)+'</div>';c.fields.forEach(function(f){h+='<div class="fg"><label class="lbl">'+esc(f.lbl[S.lang]||f.lbl.en)+'</label>';if(f.t==='s'){h+='<select class="inp" id="cf_'+f.id+'">';(f.opts||[]).forEach(function(o){h+='<option value="'+o.v+'">'+esc(o.t)+'</option>';});h+='</select>';}else{h+='<input type="number" class="inp" id="cf_'+f.id+'" placeholder="'+(f.ph||'')+'" step="any">';}h+='</div>';});h+='<button class="btn" id="cRunBtn">'+(S.lang==='ar'?'احسب':'Calculate')+'</button><div class="dres" id="cRes"></div><div style="margin-top:6px;font-size:9px;color:#93c5fd;font-weight:600">Ref: '+esc(c.ref)+'</div></div></div>';a.innerHTML=h;$('cRunBtn').onclick=function(){runCalc(c);};}
+function runCalc(c){var v={};c.fields.forEach(function(f){var e=$('cf_'+f.id);v[f.id]=f.t==='s'?parseFloat(e.value):parseFloat(e.value)||0;});var r=c.fn(v);var h='<div class="dres-v">'+r.v+'</div><div class="dres-s" style="white-space:pre-wrap">'+esc(r.f)+'</div>';if(r.n){var nt=typeof r.n==='object'?(r.n[S.lang]||r.n.en):r.n;h+='<div class="dres-w">'+esc(nt)+'</div>';}$('cRes').innerHTML=h;$('cRes').classList.add('on');}
+
+// ═══ QUIZ ═══
+function buildTopicBtns(){
+  var l=L(),tn=l.topics||{},grid=$('tgrid');grid.innerHTML='';
+  Object.keys(tn).forEach(function(k,i){var b=document.createElement('button');b.className='tb'+(i===0?' on':'');b.dataset.t=k;b.textContent=tn[k];b.onclick=function(){grid.querySelectorAll('.tb').forEach(function(x){x.classList.remove('on');});b.classList.add('on');S.qTopic=k;};grid.appendChild(b);});
+  tx('qBtn',l.newQ);tx('scl',l.score.r);tx('swl',l.score.w);tx('spl',l.score.p);
+}
+async function newQ(){
+  var l=L();if(!S.key){alert(l.noKey);return;}
+  var btn=$('qBtn');btn.disabled=true;btn.innerHTML='<div class="sp"></div>';S.qAns=false;
+  var tn=l.topics||{},topic=tn[S.qTopic]||S.qTopic;
+  var qs=S.lang==='ar'?'Generate ONE NCLEX-RN question in Arabic. Return ONLY valid JSON:\n{"q":"...","ch":["...","...","...","..."],"c":0,"e":"...with reference"}\nTopic: '+topic+'. Application level. Arabic text only.':'Generate ONE NCLEX-RN question in English. Return ONLY valid JSON:\n{"q":"...","ch":["...","...","...","..."],"c":0,"e":"...with reference"}\nTopic: '+topic+'. Application level. English only.';
+  try{
+    var r=await callGroq([{role:'user',content:qs}],.7,600);
+    var q=JSON.parse(r.replace(/\x60\x60\x60json/g,'').replace(/\x60\x60\x60/g,'').trim());
+    S.qN++;tx('s2',S.qN);tx('qNum','Q #'+S.qN);tx('qText',q.q);
+    var ch=$('qChs');ch.innerHTML='';
+    q.ch.forEach(function(c,i){var b=document.createElement('button');b.className='qch';b.textContent=c;b.onclick=function(){ansQ(i,q.c,q.e,ch);};ch.appendChild(b);});
+    $('qExp').className='qexp';$('qbox').classList.add('on');$('srow').style.display='flex';updScore();
+  }catch(ex){alert('Error: '+ex.message);}
+  btn.disabled=false;btn.textContent=l.newQ;
+}
+$('qBtn').onclick=newQ;
+function ansQ(ch,ok,exp,container){
+  if(S.qAns)return;S.qAns=true;
+  container.querySelectorAll('.qch').forEach(function(b,i){b.disabled=true;if(i===ok)b.classList.add('ok');if(i===ch&&ch!==ok)b.classList.add('no');});
+  if(ch===ok)S.qR++;else S.qW++;
+  $('qExp').textContent=exp;$('qExp').classList.add('on');updScore();
+}
+function updScore(){tx('scR',S.qR);tx('scW',S.qW);var tot=S.qR+S.qW;tx('scP',tot>0?Math.round((S.qR/tot)*100)+'%':'\u2014');tx('s3',tot>0?Math.round((S.qR/tot)*100)+'%':'\u2014');}
+
+// ═══ PROCEDURES ═══
+function buildProcCats(){
+  var s=$('procScr');s.innerHTML='';var l=L();
+  var hdr=document.createElement('div');hdr.className='shr';hdr.textContent=l.selectCat;s.appendChild(hdr);
+  var g=document.createElement('div');g.className='pcg';
+  D.procs.forEach(function(cat){
+    var d=document.createElement('div');d.className='pcc';
+    var cnt=cat.items?cat.items.length:0;
+    d.innerHTML='<div class="pc-ic" style="background:'+cat.col+'15"><svg viewBox="0 0 20 20" fill="none" stroke="'+cat.col+'" stroke-width="1.6" stroke-linecap="round"><path d="M4 3h12v14H4z"/><path d="M7 8l2 2 4-4M7 13h6"/></svg></div><div class="pc-info"><h4>'+t({ar:cat.ar,en:cat.en})+'</h4><p>&nbsp;</p>'+(cnt?'<span class="pc-cnt">'+cnt+'</span>':'')+'</div>';
+    d.onclick=function(){showProcList(cat.id);};g.appendChild(d);
+  });s.appendChild(g);
+}
+function showProcList(catId){
+  var cat=D.procs.find(function(c){return c.id===catId;});var l=L();
+  var s=$('procScr');s.innerHTML='';
+  var back=document.createElement('button');back.className='gbtn';back.style.marginBottom='8px';back.textContent=l.backCats;back.onclick=buildProcCats;s.appendChild(back);
+  var ttl=document.createElement('div');ttl.style.cssText='font-size:13px;font-weight:900;color:#fff;margin-bottom:8px';ttl.textContent=t({ar:cat.ar,en:cat.en});s.appendChild(ttl);
+  if(!cat.items||!cat.items.length){var msg=document.createElement('div');msg.style.cssText='color:var(--tx3);padding:20px;text-align:center;font-size:12px';msg.textContent=l.procSoon;s.appendChild(msg);return;}
+  var list=document.createElement('div');list.className='pl';
+  cat.items.forEach(function(p){
+    var item=document.createElement('div');item.className='pi';
+    item.innerHTML='<div class="pi-l"><div class="pi-ic" style="background:'+cat.col+'15"><svg viewBox="0 0 20 20" fill="none" stroke="'+cat.col+'" stroke-width="1.5" stroke-linecap="round"><path d="M4 3h12v14H4z"/><path d="M7 8l2 2 4-4"/></svg></div><div><h4>'+t({ar:p.ar,en:p.en})+'</h4></div></div><div class="pi-arr"><svg viewBox="0 0 20 20"><path d="'+(S.lang==='ar'?'M8 5l-4 7 4 7':'M12 5l4 7-4 7')+'" stroke="currentColor" stroke-width="1.5" fill="none"/></svg></div>';
+    item.onclick=function(){showProcDetail(catId,p.id);};list.appendChild(item);
+  });s.appendChild(list);
+}
+function showProcDetail(catId,procId){
+  var cat=D.procs.find(function(c){return c.id===catId;});
+  var proc=cat.items.find(function(p){return p.id===procId;});if(!proc)return;
+  var l=L(),s=$('procScr');s.innerHTML='';
+  var back=document.createElement('button');back.className='gbtn';back.style.marginBottom='8px';back.textContent=l.back;back.onclick=function(){showProcList(catId);};s.appendChild(back);
+  var ttl=document.createElement('div');ttl.style.cssText='font-size:16px;font-weight:900;color:#ffffff;margin-bottom:12px;text-shadow:0 1px 2px rgba(0,0,0,.3)';ttl.textContent=t({ar:proc.ar,en:proc.en});s.appendChild(ttl);
+  // Tabs
+  var tabs=document.createElement('div');tabs.className='ptabs';
+  [['vid',l.tabVid],['text',l.tabText],['quiz',l.tabQuiz]].forEach(function(pair,i){
+    var btn=document.createElement('button');btn.className='ptab'+(i===0?' on':'');btn.textContent=pair[1];
+    btn.onclick=function(){tabs.querySelectorAll('.ptab').forEach(function(t){t.classList.remove('on');});btn.classList.add('on');s.querySelectorAll('.ptp').forEach(function(p){p.classList.remove('on');});var tp=s.querySelector('#ptp-'+pair[0]);if(tp)tp.classList.add('on');};
+    tabs.appendChild(btn);
+  });s.appendChild(tabs);
+  // VIDEO
+  var vp=document.createElement('div');vp.className='ptp on';vp.id='ptp-vid';
+  if(proc.vid && proc.vid.length>3){
+    var vidId=proc.vid;
+    var embedUrl='https://www.youtube-nocookie.com/embed/'+vidId+'?rel=0&modestbranding=1&playsinline=1';
+    var watchUrl='https://www.youtube.com/watch?v='+vidId;
+    vp.innerHTML='<div class="vidc"><iframe src="'+embedUrl+'" title="'+esc(t({ar:proc.ar,en:proc.en}))+'" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0"></iframe></div><a href="'+watchUrl+'" target="_blank" rel="noopener" class="vid-link">'+(S.lang==="ar"?"\u0641\u062a\u062d \u0641\u064a YouTube \u2197":"Open in YouTube \u2197")+'</a>';
+  } else {
+    var searchQ=encodeURIComponent(t({ar:proc.ar,en:proc.en})+' nursing skill');
+    vp.innerHTML='<div style="padding:24px;text-align:center;background:var(--sur);border:1px solid var(--ln);border-radius:var(--r)"><div style="font-size:28px;margin-bottom:8px">\ud83c\udfac</div><div style="font-size:11px;color:var(--tx2);margin-bottom:10px">'+(S.lang==="ar"?"\u0633\u064a\u062a\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0641\u064a\u062f\u064a\u0648 \u0642\u0631\u064a\u0628\u0627\u064b":"Video coming soon")+'</div><a href="https://www.youtube.com/results?search_query='+searchQ+'" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;background:var(--prig);border:1px solid rgba(59,130,246,.2);color:var(--pri);padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none;font-family:var(--ff)">'+(S.lang==="ar"?"\u0627\u0628\u062d\u062b \u0641\u064a YouTube":"Search YouTube")+'</a></div>';
+  }
+  s.appendChild(vp);
+  // TEXT
+  var tp2=document.createElement('div');tp2.className='ptp';tp2.id='ptp-text';
+  var tc=document.createElement('div');tc.className='ptxt';
+  // Sections
+  (proc.secs||[]).forEach(function(sec){
+    var secEl=document.createElement('div');secEl.className='psec';
+    var hdr=document.createElement('div');hdr.className='psh';hdr.innerHTML='<div class="psh-t">'+esc(t(sec.h))+'</div>';secEl.appendChild(hdr);
+    var body=document.createElement('div');body.className='psb';
+    if(sec.steps){
+      var steps=t(sec.steps);if(Array.isArray(steps)){
+        var sl=document.createElement('div');sl.className='psteps';
+        steps.forEach(function(step,i){var st=document.createElement('div');st.className='pstep';st.innerHTML='<div class="psn">'+(i+1)+'</div><div class="pst">'+esc(step)+'</div>';sl.appendChild(st);});
+        body.appendChild(sl);
+      }
+    }else if(sec.b){body.textContent=t(sec.b);}
+    secEl.appendChild(body);tc.appendChild(secEl);
+  });
+  // Steps section
+  if(proc.steps){
+    var stepsEl=document.createElement('div');stepsEl.className='psec';
+    var stH=document.createElement('div');stH.className='psh';stH.innerHTML='<div class="psh-t">'+(S.lang==='ar'?'\u062e\u0637\u0648\u0627\u062a \u0627\u0644\u0625\u062c\u0631\u0627\u0621':'Procedure Steps')+'</div>';stepsEl.appendChild(stH);
+    var stB=document.createElement('div');stB.className='psb';
+    var steps=t(proc.steps);if(Array.isArray(steps)){
+      var sl2=document.createElement('div');sl2.className='psteps';
+      steps.forEach(function(step,i){var st=document.createElement('div');st.className='pstep';st.innerHTML='<div class="psn">'+(i+1)+'</div><div class="pst">'+esc(step)+'</div>';sl2.appendChild(st);});
+      stB.appendChild(sl2);
+    }
+    stepsEl.appendChild(stB);tc.appendChild(stepsEl);
+  }
+  // Notes
+  if(proc.notes){var notes=t(proc.notes);if(Array.isArray(notes)&&notes.length){var nb=document.createElement('div');nb.className='pnote';nb.textContent=notes.join('\n');tc.appendChild(nb);}}
+  // Danger
+  if(proc.danger){var db=document.createElement('div');db.className='pdanger';db.textContent=t(proc.danger);tc.appendChild(db);}
+  // Ref
+  if(proc.ref){var rb=document.createElement('div');rb.className='pref';rb.textContent='Ref: '+proc.ref;tc.appendChild(rb);}
+  tp2.appendChild(tc);s.appendChild(tp2);
+  // QUIZ
+  var qp=document.createElement('div');qp.className='ptp';qp.id='ptp-quiz';
+  if(proc.quiz&&proc.quiz.length){
+    var ql=document.createElement('div');ql.className='pql';
+    proc.quiz.forEach(function(q,qi){
+      var ans=false,item=document.createElement('div');item.className='pqi';
+      item.innerHTML='<div class="pqn">Q '+(qi+1)+' / '+proc.quiz.length+'</div><div class="pqq">'+esc(t(q.q))+'</div>';
+      var qcs=document.createElement('div');qcs.className='pqcs';
+      var choices=t(q.ch);
+      if(Array.isArray(choices)){choices.forEach(function(c,ci){
+        var btn=document.createElement('button');btn.className='pqc';btn.textContent=c;
+        btn.onclick=function(){if(ans)return;ans=true;qcs.querySelectorAll('.pqc').forEach(function(b,i){b.disabled=true;if(i===q.c)b.classList.add('ok');if(i===ci&&ci!==q.c)b.classList.add('no');});item.querySelector('.pqe').textContent=t(q.e);item.querySelector('.pqe').classList.add('on');};
+        qcs.appendChild(btn);
+      });}
+      item.appendChild(qcs);var exp=document.createElement('div');exp.className='pqe';item.appendChild(exp);ql.appendChild(item);
+    });qp.appendChild(ql);
+  }
+  s.appendChild(qp);
+}
+
+// ═══ VITALS ═══
+var VR={hr:{l:60,h:100},rr:{l:12,h:20},temp:{l:36.5,h:37.5},spo2:{l:95,h:100},gcs:{l:13,h:15},bg:{l:70,h:110}};
+var VN={hr:['Bradycardia','Normal','Tachycardia'],rr:['Bradypnea','Normal','Tachypnea'],temp:['Hypothermia','Normal','Fever'],spo2:['Hypoxia','Normal','Normal'],gcs:['Altered LOC','Normal','Normal'],bg:['Hypoglycemia','Normal','Hyperglycemia']};
+window.ckv=function(id,v){
+  if(id==='bp'){var sys=parseFloat($('vSys').value),dia=parseFloat($('vDia').value),el=$('vs-bp');if(!sys&&!dia){el.textContent='';el.className='vs';return;}var txt,cls;if(sys>180||dia>120){txt='HTN Crisis';cls='vc2';}else if(sys>140||dia>90){txt='Hypertension';cls='vw2';}else if(sys<90||dia<60){txt='Hypotension';cls='vw2';}else{txt='Normal';cls='vn2';}el.textContent=txt;el.className='vs '+cls;return;}
+  var val=parseFloat(v),el=$('vs-'+id);if(!val){el.textContent='';el.className='vs';return;}
+  var r=VR[id],n=VN[id],txt,cls;
+  if(val<r.l){txt=n[0];cls=(id==='spo2'||id==='gcs')?'vc2':'vw2';}else if(val>r.h){txt=n[2];cls='vw2';}else{txt=n[1];cls='vn2';}
+  el.textContent=txt;el.className='vs '+cls;
+};
+
+// ═══ INIT ═══
+try{var k=localStorage.getItem('naik');if(k){$('apiIn').value=k;S.key=k;setDots('ok');}}catch(e){}
+}catch(e){document.body.innerHTML='<div style="padding:20px;color:red;font-size:14px">Error: '+e.message+'<br>Line: '+(e.line||'?')+'</div>';}
+})();
+</script>
+
+</body>
+</html>
