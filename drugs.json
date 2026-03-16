@@ -1,0 +1,247 @@
+[
+  {
+    "n": "Paracetamol (Acetaminophen)",
+    "d": "10:15:1000:q4-6h",
+    "cat": "Analgesic"
+  },
+  {
+    "n": "Ibuprofen",
+    "d": "5:10:400:q6-8h",
+    "cat": "NSAID"
+  },
+  {
+    "n": "Morphine Sulfate",
+    "d": "0.1:0.2:10:q4h",
+    "cat": "Opioid"
+  },
+  {
+    "n": "Fentanyl",
+    "d": "0.001:0.002:0.1:q1-2h",
+    "cat": "Opioid"
+  },
+  {
+    "n": "Tramadol",
+    "d": "1:2:400:q6h",
+    "cat": "Opioid"
+  },
+  {
+    "n": "Ketorolac (Toradol)",
+    "d": "0.5:0.5:30:q6h",
+    "cat": "NSAID"
+  },
+  {
+    "n": "Amoxicillin",
+    "d": "25:50:500:q8h",
+    "cat": "Penicillin"
+  },
+  {
+    "n": "Amoxicillin/Clavulanate",
+    "d": "25:45:875:q8-12h",
+    "cat": "Penicillin"
+  },
+  {
+    "n": "Ampicillin",
+    "d": "25:50:2000:q6h",
+    "cat": "Penicillin"
+  },
+  {
+    "n": "Cefazolin",
+    "d": "25:100:2000:q8h",
+    "cat": "Cephalosporin"
+  },
+  {
+    "n": "Ceftriaxone",
+    "d": "50:100:4000:q12-24h",
+    "cat": "Cephalosporin"
+  },
+  {
+    "n": "Cefepime",
+    "d": "50:50:2000:q8-12h",
+    "cat": "Cephalosporin"
+  },
+  {
+    "n": "Vancomycin",
+    "d": "15:20:2000:q6-12h",
+    "cat": "Glycopeptide"
+  },
+  {
+    "n": "Gentamicin",
+    "d": "5:7:360:q24h",
+    "cat": "Aminoglycoside"
+  },
+  {
+    "n": "Amikacin",
+    "d": "15:22:1500:q24h",
+    "cat": "Aminoglycoside"
+  },
+  {
+    "n": "Metronidazole",
+    "d": "7.5:15:500:q8h",
+    "cat": "Nitroimidazole"
+  },
+  {
+    "n": "Clindamycin",
+    "d": "10:30:900:q8h",
+    "cat": "Lincosamide"
+  },
+  {
+    "n": "Piperacillin/Tazobactam",
+    "d": "100:100:4000:q6-8h",
+    "cat": "Penicillin"
+  },
+  {
+    "n": "Meropenem",
+    "d": "20:40:2000:q8h",
+    "cat": "Carbapenem"
+  },
+  {
+    "n": "Azithromycin",
+    "d": "10:10:500:q24h",
+    "cat": "Macrolide"
+  },
+  {
+    "n": "Ciprofloxacin",
+    "d": "10:15:750:q12h",
+    "cat": "Fluoroquinolone"
+  },
+  {
+    "n": "Heparin",
+    "d": "80:80:10000:IV bolus",
+    "cat": "Anticoagulant"
+  },
+  {
+    "n": "Enoxaparin (Lovenox)",
+    "d": "1:1.5:150:q12-24h",
+    "cat": "LMWH"
+  },
+  {
+    "n": "Dopamine",
+    "d": "2:20:800:mcg/kg/min",
+    "cat": "Vasopressor"
+  },
+  {
+    "n": "Dobutamine",
+    "d": "2.5:15:750:mcg/kg/min",
+    "cat": "Inotrope"
+  },
+  {
+    "n": "Epinephrine",
+    "d": "0.01:0.01:1:IV q3-5min",
+    "cat": "Emergency"
+  },
+  {
+    "n": "Atropine",
+    "d": "0.02:0.02:0.5:IV q5min",
+    "cat": "Anticholinergic"
+  },
+  {
+    "n": "Amiodarone",
+    "d": "5:5:300:IV bolus",
+    "cat": "Antiarrhythmic"
+  },
+  {
+    "n": "Adenosine",
+    "d": "0.1:0.1:12:rapid IV push",
+    "cat": "Antiarrhythmic"
+  },
+  {
+    "n": "Midazolam (Versed)",
+    "d": "0.05:0.1:5:q2-4h",
+    "cat": "Benzodiazepine"
+  },
+  {
+    "n": "Diazepam (Valium)",
+    "d": "0.1:0.3:10:q6-8h",
+    "cat": "Benzodiazepine"
+  },
+  {
+    "n": "Lorazepam (Ativan)",
+    "d": "0.05:0.1:4:q6-8h",
+    "cat": "Benzodiazepine"
+  },
+  {
+    "n": "Haloperidol",
+    "d": "0.01:0.05:5:q4-8h",
+    "cat": "Antipsychotic"
+  },
+  {
+    "n": "Dexamethasone",
+    "d": "0.15:0.6:10:q6h",
+    "cat": "Corticosteroid"
+  },
+  {
+    "n": "Methylprednisolone",
+    "d": "1:2:125:q6h",
+    "cat": "Corticosteroid"
+  },
+  {
+    "n": "Hydrocortisone",
+    "d": "1:5:100:q6-8h",
+    "cat": "Corticosteroid"
+  },
+  {
+    "n": "Ondansetron (Zofran)",
+    "d": "0.1:0.15:8:q8h",
+    "cat": "Antiemetic"
+  },
+  {
+    "n": "Metoclopramide",
+    "d": "0.1:0.15:10:q6-8h",
+    "cat": "Prokinetic"
+  },
+  {
+    "n": "Pantoprazole",
+    "d": "1:1:40:q12-24h",
+    "cat": "PPI"
+  },
+  {
+    "n": "Ranitidine",
+    "d": "2:4:150:q12h",
+    "cat": "H2 Blocker"
+  },
+  {
+    "n": "Potassium Chloride",
+    "d": "0.5:1:40:mEq/day",
+    "cat": "Electrolyte"
+  },
+  {
+    "n": "Calcium Gluconate",
+    "d": "50:100:3000:IV slow",
+    "cat": "Electrolyte"
+  },
+  {
+    "n": "Magnesium Sulfate",
+    "d": "25:50:4000:IV loading",
+    "cat": "Electrolyte"
+  },
+  {
+    "n": "Furosemide (Lasix)",
+    "d": "1:2:80:q6-12h",
+    "cat": "Loop Diuretic"
+  },
+  {
+    "n": "Mannitol",
+    "d": "0.25:1:200:q6-8h",
+    "cat": "Osmotic Diuretic"
+  },
+  {
+    "n": "Phenytoin (Dilantin)",
+    "d": "5:8:300:q8h",
+    "cat": "Anticonvulsant"
+  },
+  {
+    "n": "Levetiracetam (Keppra)",
+    "d": "10:30:1500:q12h",
+    "cat": "Anticonvulsant"
+  },
+  {
+    "n": "Oxytocin (Pitocin)",
+    "d": "0.001:0.04:40:mU/min IV",
+    "cat": "Uterotonic"
+  },
+  {
+    "n": "Magnesium Sulfate (OB)",
+    "d": "4:6:6000:IV loading",
+    "cat": "Tocolytic"
+  }
+]
