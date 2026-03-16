@@ -1,5 +1,0 @@
-{
-  "buildCommand": "node generate.js",
-  "outputDirectory": "dist",
-  "installCommand": "echo 'No dependencies needed'"
-}
