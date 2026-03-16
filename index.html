@@ -114,7 +114,7 @@ select.inp{-webkit-appearance:none;appearance:none}
 .rbox.on{display:block}
 .rh{padding:10px 16px;border-bottom:1px solid var(–ln)}
 .rbadge{font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(–pri);background:var(–prig);padding:3px 8px;border-radius:6px}
-.rbody{padding:16px;font-size:13px;line-height:1.9;color:var(–tx);white-space:pre-wrap;word-break:break-word;max-height:none}
+.rbody{padding:16px;font-size:13px;line-height:1.9;color:var(–tx);white-space:pre-wrap;word-break:break-word;overflow-y:visible}
 
 /* ═══ DASHBOARD ═══ */
 .hero{background:var(–sur);border:1px solid var(–ln);border-radius:var(–r);padding:22px 18px;position:relative;overflow:hidden}
@@ -299,7 +299,7 @@ select.inp{-webkit-appearance:none;appearance:none}
 <div style="display:flex;gap:5px;flex-wrap:wrap" id="dChips"></div>
 </div></div>
 <div class="vw" id="vw-chat"><div class="cw"><div class="cm" id="cm"><div class="cwelcome"><div class="cw-t" id="cwT"></div><div class="cw-s" id="cwS"></div></div></div><div class="ccr" id="ccr"></div><div class="cia"><button class="send" id="sendBtn"><svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5"/></svg></button><textarea class="cta" id="ci" rows="1"></textarea></div></div></div>
-<div class="vw" id="vw-drugs"><div class="scr"><div class="card"><div class="cb"><input type="text" class="inp" id="drugQ" style="direction:auto"><div style="height:6px"></div><button class="btn" id="drugBtn"></button></div></div><div class="loading" id="drugLoad"><div class="sp"></div><p id="drugLoadT"></p></div><div class="rbox" id="drugRes"></div></div></div>
+<div class="vw" id="vw-drugs"><div class="scr" style="overflow-y:auto;-webkit-overflow-scrolling:touch"><div class="card"><div class="cb"><input type="text" class="inp" id="drugQ" style="direction:auto"><div style="height:6px"></div><button class="btn" id="drugBtn"></button></div></div><div class="loading" id="drugLoad"><div class="sp"></div><p id="drugLoadT"></p></div><div class="rbox" id="drugRes"></div></div></div>
 <div class="vw" id="vw-dose"><div class="scr"><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px" id="calcGrid"></div><div id="calcArea"></div></div></div>
 <div class="vw" id="vw-quiz"><div class="scr"><div class="card"><div class="cb"><div class="tgrid" id="tgrid"></div><button class="btn" id="qBtn"></button></div></div><div class="srow" id="srow" style="display:none"><div class="sbdg"><span id="scl"></span>: <b id="scR">0</b></div><div class="sbdg"><span id="swl"></span>: <b id="scW">0</b></div><div class="sbdg"><span id="spl"></span>: <b id="scP">—</b></div></div><div class="qbox" id="qbox"><div class="qnum" id="qNum"></div><div class="qtext" id="qText"></div><div class="qchs" id="qChs"></div><div class="qexp" id="qExp"></div></div></div></div>
 <div class="vw" id="vw-proc"><div class="scr" id="procScr"></div></div>
@@ -413,7 +413,7 @@ $("apiIn").oninput=function(){
 };
 
 // ═══ GROQ API ═══
-function sysPrompt(){var l=L();return "You are NurseAI Pro, a clinical nursing AI. "+l.syslang+" Answer ONLY from: NCLEX-RN, WHO, Mosby Drug Reference, Brunner & Suddarth 14th ed, Potter & Perry 10th ed, AHA BLS/ACLS 2020, Lowdermilk 11th ed, Wong Pediatric 11th ed, Bates Guide 12th ed. End with: [Category] | Ref: [source] | Safety: [point]";}
+function sysPrompt(){var l=L();return "You are NurseAI Pro, a clinical nursing AI assistant. CRITICAL LANGUAGE RULE: Answer in the SAME language the user writes in. If the user writes in Arabic, respond in Arabic. If the user writes in English, respond in English. IMPORTANT: In ALL cases, keep medical and nursing terminology in English (e.g., write Hypoglycemia not نقص السكر, write Cardiac Output not النتاج القلبي, write Assessment not التقييم). This helps nurses learn and use correct clinical terminology. Answer ONLY from evidence-based references: NCLEX-RN, WHO, Mosby Drug Reference, Brunner & Suddarth 14th ed, Potter & Perry 10th ed, AHA BLS/ACLS 2020, Lowdermilk 11th ed, Wong Pediatric 11th ed, Bates Guide 12th ed. End every answer with: [Category] | Ref: [source] | Safety: [key point]";}
 function callGroq(msgs,temp,maxTok){
   if(!S.key)return Promise.reject(new Error(L().noKey2));
   if(!S.key.startsWith("gsk_"))return Promise.reject(new Error("Key must start with gsk_"));
@@ -464,7 +464,7 @@ function quickAsk(t){$("ci").value=t;navTo("chat");doSend();}
 function searchDrug(){
   var q=$("drugQ").value.trim();if(!q)return;var l=L();
   $("drugBtn").disabled=true;$("drugLoad").classList.add("on");$("drugRes").classList.remove("on");tx("drugLoadT",l.drugLoading);
-  var sys="You are a clinical pharmacist. "+l.syslang+" Provide: Drug Name, Class, Dose (Adult/Peds/Renal), Route, Contraindications, Nursing Assessment, Patient Education, Antidote. Reference: Mosby Drug Reference.";
+  var sys="You are a clinical pharmacist AI. Answer in the SAME language the user asks in. If Arabic, answer in Arabic but keep ALL medical terms in English. If English, answer in English. Provide ALL of the following in organized sections: 1) Drug Name (Generic + Trade) 2) Class 3) Indications (what is it used for) 4) Mechanism of Action (brief) 5) Dose: Adult / Pediatric / Renal Adjustment / Hepatic Adjustment 6) Route (PO/IV/IM/SC/Topical) 7) Contraindications 8) Side Effects (common + serious) 9) Drug Interactions (important ones) 10) Nursing Assessment (what to monitor: labs, vitals, symptoms) 11) Patient Education (what to tell the patient) 12) Antidote (if applicable) 13) Pregnancy Category. Reference: Mosby Drug Reference + Brunner & Suddarth.";
   callGroq([{role:"system",content:sys},{role:"user",content:q}],.1,1400).then(function(r){
     $("drugRes").innerHTML="<div class=\"rh\"><div class=\"rbadge\">"+esc(q)+"</div></div><div class=\"rbody\">"+esc(r)+"</div>";$("drugRes").classList.add("on");
   }).catch(function(ex){
