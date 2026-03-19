@@ -29,6 +29,9 @@
 [lang=ar]{--ff:'Noto Sans Arabic','Inter',system-ui,sans-serif}
 html,body{height:100%;overflow:hidden;background:var(--bg);font-family:var(--ff);color:var(--tx)}
 ::selection{background:rgba(13,148,136,.12)}
+input,textarea,select{color:#1c1917!important;-webkit-text-fill-color:#1c1917!important}
+input::placeholder,textarea::placeholder{color:#a8a29e!important;-webkit-text-fill-color:#a8a29e!important}
+input:focus,textarea:focus,select:focus{color:#1c1917!important;-webkit-text-fill-color:#1c1917!important}
 
 /* ═══ SPLASH ═══ */
 #LS{position:fixed;inset:0;z-index:9999;background:var(–bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:32px}
@@ -241,23 +244,8 @@ select.inp{-webkit-appearance:none;appearance:none}
 .vn{background:var(–grng);color:var(–grn);border:1px solid rgba(5,150,105,.1)}
 .vw2{background:var(–ambg);color:var(–amb);border:1px solid rgba(180,83,9,.1)}
 .vc2{background:var(–redg);color:var(–red);border:1px solid rgba(220,38,38,.1)}
-
-/* FORCE ALL TEXT DARK */
-*{color:inherit}
-body,div,span,p,h1,h2,h3,h4,h5,h6,label,a{color:#1c1917}
-input,textarea,select{color:#1c1917!important;-webkit-text-fill-color:#1c1917!important;caret-color:#1c1917}
-input::placeholder,textarea::placeholder{color:#a8a29e!important;-webkit-text-fill-color:#a8a29e!important}
-.msg.u .bbl,.msg.u .bbl *,.send,.btn,.psn,.btag{color:#fff!important;-webkit-text-fill-color:#fff!important}
-.sv{color:var(–pri)!important;-webkit-text-fill-color:var(–pri)!important}
-.psh-t{color:var(–pri)!important}
-.qnum,#qNum{color:var(–pri)!important}
-.sbdg b{color:var(–pri)!important}
-.bt{color:#a8a29e!important}
-.bt.on{color:var(–pri)!important}
-.h-t{color:#1c1917!important}
-.h-s{color:#a8a29e!important}
-
 </style>
+
 </head>
 <body>
 
@@ -311,35 +299,11 @@ input::placeholder,textarea::placeholder{color:#a8a29e!important;-webkit-text-fi
 <div style="display:flex;gap:5px;flex-wrap:wrap" id="dChips"></div>
 </div></div>
 <div class="vw" id="vw-chat"><div class="cw"><div style="display:flex;gap:6px;padding:8px 16px;border-bottom:1px solid var(--ln);flex-shrink:0;align-items:center"><button class="gbtn" id="newChatBtn" style="font-size:11px;padding:6px 12px">+ New Chat</button><div style="flex:1;overflow-x:auto;display:flex;gap:4px;-webkit-overflow-scrolling:touch" id="chatTabs"></div></div><div class="cm" id="cm"><div class="cwelcome"><div class="cw-t" id="cwT"></div><div class="cw-s" id="cwS"></div></div></div><div class="ccr" id="ccr"></div><div class="cia"><button class="send" id="sendBtn"><svg viewBox="0 0 18 18"><path d="M9 15V3M4 8l5-5 5 5"/></svg></button><textarea class="cta" id="ci" rows="1"></textarea></div></div></div>
-<div class="vw" id="vw-drugs"><div style="padding:16px;flex-shrink:0;overflow:visible"><div class="card"><div class="cb"><input type="text" class="inp" id="drugQ" style="direction:auto"><div style="height:6px"></div><button class="btn" id="drugBtn"></button></div></div></div><div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 90px"><div class="loading" id="drugLoad"><div class="sp"></div><p id="drugLoadT"></p></div><div class="rbox" id="drugRes"></div></div></div>
-<div class="vw" id="vw-dose"><div class="scr" style="overflow-y:scroll!important;-webkit-overflow-scrolling:touch"><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px" id="calcGrid"></div><div id="calcArea"></div></div></div>
-<div class="vw" id="vw-quiz">
-<div style="height:100%;overflow-y:scroll;-webkit-overflow-scrolling:touch">
-<div style="padding:16px;padding-bottom:120px;display:flex;flex-direction:column;gap:14px">
-
-<div style="font-size:12px;font-weight:700;color:#78716c;letter-spacing:1px;text-transform:uppercase">SELECT TOPIC</div>
-<div id="tgrid" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-
-<button class="btn" id="qBtn" style="flex-shrink:0">New Question</button>
-
-<div id="srow" style="display:flex;gap:6px;flex-wrap:wrap">
-<div style="background:#fff;border:1.5px solid #e7e5e4;border-radius:10px;padding:5px 12px;font-size:11px;color:#78716c;font-weight:600"><span id="scl">Correct</span>: <b id="scR" style="color:#0d9488">0</b></div>
-<div style="background:#fff;border:1.5px solid #e7e5e4;border-radius:10px;padding:5px 12px;font-size:11px;color:#78716c;font-weight:600"><span id="swl">Wrong</span>: <b id="scW" style="color:#dc2626">0</b></div>
-<div style="background:#fff;border:1.5px solid #e7e5e4;border-radius:10px;padding:5px 12px;font-size:11px;color:#78716c;font-weight:600"><span id="spl">Score</span>: <b id="scP" style="color:#0d9488">—</b></div>
-</div>
-
-<div id="qbox" style="display:none;background:#ffffff;border:1.5px solid #e7e5e4;border-radius:18px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.03)">
-<div id="qNum" style="font-size:10px;color:#0d9488;margin-bottom:10px;font-weight:800;letter-spacing:1px"></div>
-<div id="qText" style="font-size:16px;font-weight:700;line-height:1.8;margin-bottom:16px;color:#1c1917"></div>
-<div id="qChs" style="display:flex;flex-direction:column;gap:8px"></div>
-<div id="qExp" style="display:none;margin-top:14px;background:#f0fdfa;border:1.5px solid #ccfbf1;border-radius:12px;padding:16px;font-size:13px;line-height:1.9;color:#134e4a"></div>
-</div>
-
-</div>
-</div>
-</div>
-<div class="vw" id="vw-proc"><div class="scr" id="procScr" style="overflow-y:scroll!important;-webkit-overflow-scrolling:touch"></div></div>
-<div class="vw" id="vw-vitals"><div class="scr" style="overflow-y:scroll!important;-webkit-overflow-scrolling:touch">
+<div class="vw" id="vw-drugs"><div style="padding:16px;flex-shrink:0"><div class="card"><div class="cb"><input type="text" class="inp" id="drugQ" style="direction:auto"><div style="height:6px"></div><button class="btn" id="drugBtn"></button></div></div></div><div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 16px 90px"><div class="loading" id="drugLoad"><div class="sp"></div><p id="drugLoadT"></p></div><div class="rbox" id="drugRes"></div></div></div>
+<div class="vw" id="vw-dose"><div class="scr"><div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px" id="calcGrid"></div><div id="calcArea"></div></div></div>
+<div class="vw" id="vw-quiz"><div class="scr" style="padding-bottom:100px"><div class="card"><div class="cb"><div class="tgrid" id="tgrid"></div><button class="btn" id="qBtn"></button></div></div><div class="srow" id="srow" style="display:none"><div class="sbdg"><span id="scl"></span>: <b id="scR">0</b></div><div class="sbdg"><span id="swl"></span>: <b id="scW">0</b></div><div class="sbdg"><span id="spl"></span>: <b id="scP">—</b></div></div><div class="qbox" id="qbox"><div class="qnum" id="qNum"></div><div class="qtext" id="qText"></div><div class="qchs" id="qChs"></div><div class="qexp" id="qExp"></div></div></div></div>
+<div class="vw" id="vw-proc"><div class="scr" id="procScr"></div></div>
+<div class="vw" id="vw-vitals"><div class="scr">
 <div class="shr" id="vitHdr"></div>
 <div class="vg">
 <div class="vc"><label>HR (bpm)</label><input type="number" class="vi" id="vHR" placeholder="72"><div class="vs" id="vs-hr"></div></div>
@@ -636,65 +600,23 @@ function runCalc(c){
 
 // ═══ QUIZ ═══
 function buildTopicBtns(){
-  var l=L(),tn=l.topics||{},grid=$("tgrid");if(!grid)return;grid.innerHTML="";
-  var keys=Object.keys(tn);
-  keys.forEach(function(k,i){
-    var b=document.createElement("button");
-    var isFirst=(i===0);
-    b.style.cssText="padding:9px 18px;border-radius:100px;font-size:12px;font-weight:600;font-family:var(--ff);cursor:pointer;white-space:nowrap;box-shadow:0 1px 2px rgba(0,0,0,.04);-webkit-tap-highlight-color:transparent;"
-      +"border:1.5px solid "+(isFirst?"#0d9488":"#d6d3d1")+";"
-      +"background:"+(isFirst?"#f0fdfa":"#ffffff")+";"
-      +"color:"+(isFirst?"#0d9488":"#57534e")+";";
-    b.textContent=tn[k];
-    b.onclick=function(){
-      grid.querySelectorAll("button").forEach(function(x){
-        x.style.background="#ffffff";x.style.color="#57534e";x.style.borderColor="#d6d3d1";
-      });
-      b.style.background="#f0fdfa";b.style.color="#0d9488";b.style.borderColor="#0d9488";
-      S.qTopic=k;
-    };
-    grid.appendChild(b);
-  });
-  if(keys.length>0)S.qTopic=keys[0];
+  var l=L(),tn=l.topics||{},grid=$("tgrid");grid.innerHTML="";
+  Object.keys(tn).forEach(function(k,i){var b=document.createElement("button");b.className="tb"+(i===0?" on":"");b.textContent=tn[k];b.onclick=function(){grid.querySelectorAll(".tb").forEach(function(x){x.classList.remove("on");});b.classList.add("on");S.qTopic=k;};grid.appendChild(b);});
 }
 function newQ(){
-  var l=L();
+  var l=L();if(!S.key){alert(l.noKey);return;}
   var btn=$("qBtn");btn.disabled=true;btn.innerHTML="<div class=\"sp\"></div>";S.qAns=false;
   var tn=l.topics||{},topic=tn[S.qTopic]||S.qTopic;
-  var langStr=S.lang==="ar"?"Generate ONE NCLEX-RN question in Arabic about "+topic+". Return ONLY valid JSON: {\"q\":\"question\",\"ch\":[\"a\",\"b\",\"c\",\"d\"],\"c\":0,\"e\":\"explanation\"}":"Generate ONE NCLEX-RN question in English about "+topic+". Return ONLY valid JSON: {\"q\":\"question\",\"ch\":[\"a\",\"b\",\"c\",\"d\"],\"c\":0,\"e\":\"explanation\"}";
-  callGroq([{role:"user",content:langStr}],.7,600).then(function(r){
-    var start2=r.indexOf("{"),end2=r.lastIndexOf("}")+1;
-    var clean=start2>=0&&end2>start2?r.substring(start2,end2):r;
+  var qs=S.lang==="ar"?"Generate ONE NCLEX-RN question in Arabic. Return ONLY valid JSON: {\"q\":\"...\",\"ch\":[\"...\"],\"c\":0,\"e\":\"...\"} Topic: "+topic:"Generate ONE NCLEX-RN question in English. Return ONLY JSON: {\"q\":\"...\",\"ch\":[\"...\"],\"c\":0,\"e\":\"...\"} Topic: "+topic;
+  callGroq([{role:"user",content:qs}],.7,600).then(function(r){
+    var clean=r.replace(/[\x60]/g,"").replace(/^[^{]*/, "").replace(/[^}]*$/, "");
     var q=JSON.parse(clean);
-    S.qN++;tx("s2",S.qN);
-    $("qNum").textContent="Q #"+S.qN+" — "+topic;
-    $("qText").textContent=q.q;
+    S.qN++;tx("s2",S.qN);tx("qNum","Q #"+S.qN);tx("qText",q.q);
     var ch=$("qChs");ch.innerHTML="";
-    q.ch.forEach(function(c,i){
-      var b=document.createElement("button");
-      b.style.cssText="background:var(--bg2);border:1.5px solid var(--ln);border-radius:var(--rs);padding:13px 16px;font-family:var(--ff);font-size:13px;color:var(--tx);cursor:pointer;line-height:1.6;width:100%;text-align:"+(S.lang==="ar"?"right":"left");
-      b.textContent=c;
-      b.onclick=function(){ansQ(i,q.c,q.e,ch);};
-      ch.appendChild(b);
-    });
-    $("qExp").style.display="none";
-    $("qbox").style.display="block";
-    $("srow").style.display="flex";
-    updScore();
+    q.ch.forEach(function(c,i){var b=document.createElement("button");b.className="qch";b.textContent=c;b.onclick=function(){ansQ(i,q.c,q.e,ch);};ch.appendChild(b);});
+    $("qExp").className="qexp";$("qbox").classList.add("on");$("srow").style.display="flex";updScore();
   }).catch(function(ex){alert("Error: "+ex.message);}).then(function(){btn.disabled=false;btn.textContent=l.newQ;});
 }
-function ansQ(ch,ok,exp,container){
-  if(S.qAns)return;S.qAns=true;
-  container.querySelectorAll("button").forEach(function(b,i){
-    b.style.pointerEvents="none";
-    if(i===ok){b.style.borderColor="#059669";b.style.background="#ecfdf5";b.style.color="#065f46";b.style.borderWidth="2px";b.style.fontWeight="700";}
-    if(i===ch&&ch!==ok){b.style.borderColor="#dc2626";b.style.background="#fef2f2";b.style.color="#991b1b";b.style.borderWidth="2px";}
-  });
-  if(ch===ok)S.qR++;else S.qW++;
-  $("qExp").textContent=exp;$("qExp").style.display="block";
-  updScore();
-}
-function updScore(){tx("scR",S.qR);tx("scW",S.qW);var tot=S.qR+S.qW;tx("scP",tot>0?Math.round((S.qR/tot)*100)+"%":"—");tx("s3",tot>0?Math.round((S.qR/tot)*100)+"%":"—");}
 $("qBtn").onclick=newQ;
 function ansQ(ch,ok,exp,container){
   if(S.qAns)return;S.qAns=true;
